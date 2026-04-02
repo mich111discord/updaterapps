@@ -20,22 +20,19 @@ rule VCEngine_NPE_HarmTool_Gen
 rule VCEngine_PUP_McAfee_Setup
 {
     strings:
-        $m1 = "McAfee, LLC" nocase wide ascii
-        $m2 = "McAfee Security" nocase wide ascii
-        $m3 = "McAfee Installer" nocase wide ascii
-        $p1 = "McUICnt.exe" nocase wide ascii
-        $p2 = "mclinst.exe" nocase wide ascii
+        $m1 = "McAfee" nocase wide ascii
+        $m2 = "mclinst" nocase wide ascii
+        $m3 = "McUICnt" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and ($m1 or $m2 or $m3 or $p2)
+        uint16(0) == 0x5A4D and any of them
 }
 
 rule VCEngine_PUP_Norton_Setup
 {
     strings:
-        $n1 = "Norton Download Manager" nocase wide ascii
-        $n2 = "Symantec Corporation" nocase wide ascii
-        $n3 = "NortonInstall" nocase wide ascii
-        $p1 = "NSDownloader.exe" nocase wide ascii
+        $n1 = "Norton" nocase wide ascii
+        $n2 = "Symantec" nocase wide ascii
+        $n3 = "NSDownloader" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and ($n1 or $n3 or $p1) and $n2
+        uint16(0) == 0x5A4D and any of them
 }
