@@ -37,7 +37,7 @@ rule VCEngine_PUP_Norton_Setup
         uint16(0) == 0x5A4D and any of them
 }
 
-rule VCEngine_Exploit_RCE_DarkSword_Gen
+rule VCEngine_Exploit_Gen_A
 {
     strings:
         $s1 = "DarkSword" nocase wide ascii
@@ -46,6 +46,7 @@ rule VCEngine_Exploit_RCE_DarkSword_Gen
         $s4 = "exploit" nocase wide ascii
         $s5 = "RCE" nocase wide ascii
         $s6 = "shellcode" nocase wide ascii
+        $s7 = "bypass" nocase wide ascii
     condition:
         (uint16(0) == 0x5A4D or uint16(0) == 0x4B50) and (2 of them)
 }
