@@ -11,13 +11,10 @@ rule VCEngine_Trojan_Bat_ForkBomb_Gen
 rule VCEngine_NPE_HarmTool_Gen
 {
     strings:
-        $s1 = "Norton Power Eraser" nocase wide ascii
-        $s2 = "NPE.exe" nocase wide ascii
-        $s3 = "Symantec Corporation" nocase wide ascii
-        $f1 = "PowerEraser" nocase wide ascii
-        $f2 = "Symantec Eraser" nocase wide ascii
+        $s1 = "Norton" nocase wide ascii
+        $s2 = "Power Eraser" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and ($s1 or $f1) and $s3
+        $s1 or $s2
 }
 
 rule VCEngine_PUP_McAfee_Setup
