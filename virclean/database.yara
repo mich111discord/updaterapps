@@ -1,4 +1,4 @@
-rule Trojan_Bat_ForkBomb_Gen
+rule VCEngine.Trojan_Bat_ForkBomb_Gen
 {
     strings:
         $a = /start\s+/ nocase
