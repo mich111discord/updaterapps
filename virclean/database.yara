@@ -31,7 +31,7 @@ rule VCEngine_PUP_Security_Software_Setup
         uint16(0) == 0x5A4D and (2 of them)
 }
 
-rule VCEngine_Exploit_A
+rule VCEngine_Exploit_RCE_DarkSword_Strict
 {
     strings:
         $ds = "DarkSword" nocase wide ascii
