@@ -218,3 +218,296 @@ rule VCEngine_Adware_Generic_B
         uint16(0) == 0x5A4D and 2 of them
 }
 
+rule VCEngine_Spyware_Keylogger_Gen {
+    meta:
+        display_name = "VCEngine/Spyware.Win32.Keylogger"
+        description = "Wykryto funkcje śledzenia klawiatury (Keylogging) używane do kradzieży haseł."
+    strings:
+        $f1 = "SetWindowsHookEx" ascii
+        $f2 = "GetAsyncKeyState" ascii
+        $f3 = "GetForegroundWindow" ascii
+        $f4 = "keylog" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (3 of ($f1, $f2, $f3, $f4))
+}
+
+rule VCEngine_Spyware_ScreenCapture {
+    meta:
+        display_name = "VCEngine/Spyware.Win32.ScreenSpy"
+        description = "Wykryto próby wykonywania zrzutów ekranu bez wiedzy użytkownika."
+    strings:
+        $g1 = "CreateCompatibleBitmap" ascii
+        $g2 = "BitBlt" ascii
+        $g3 = "GetDC" ascii
+        $g4 = "capCreateCaptureWindow" ascii
+    condition:
+        all of them
+}
+
+rule VCEngine_Infostealer_Browser_Paths {
+    meta:
+        display_name = "VCEngine/Stealer.Win32.BrowserData"
+        description = "Wykryto próby dostępu do wrażliwych danych przeglądarek (hasła, ciasteczka, bazy SQLite)."
+    strings:
+        $p1 = "\\Google\\Chrome\\User Data" ascii nocase
+        $p2 = "\\Opera Software\\Opera GX" ascii nocase
+        $p3 = "\\Microsoft\\Edge\\User Data" ascii nocase
+        $p4 = "Login Data" ascii nocase
+        $p5 = "Web Data" ascii nocase
+        $p6 = "Cookies" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of ($p1, $p2, $p3) and 1 of ($p4, $p5, $p6))
+}
+
+rule VCEngine_Infostealer_Discord_Token {
+    meta:
+        display_name = "VCEngine/Stealer.Win32.DiscordToken"
+        description = "Wykryto próbę kradzieży tokenu autoryzacyjnego aplikacji Discord."
+    strings:
+        $d1 = "discordapp.com/api/v" ascii nocase
+        $d2 = "Local Storage\\leveldb" ascii nocase
+        $d3 = "tokens.txt" ascii nocase
+        $regex_token = /[a-zA-Z0-9_-]{24}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27}/
+    condition:
+        2 of ($d1, $d2, $d3) or $regex_token
+}
+
+rule VCEngine_Miner_Crypto_Gen {
+    meta:
+        display_name = "VCEngine/Miner.Win32.Cryptonight"
+        description = "Wykryto koparkę kryptowalut obciążającą procesor i kartę graficzną."
+    strings:
+        $m1 = "cryptonight" ascii nocase
+        $m2 = "stratum+tcp://" ascii nocase
+        $m3 = "xmrig" ascii nocase
+        $m4 = "mine.moneropool.com" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+rule VCEngine_PUP_VPNProxyMaster {
+    meta:
+        display_name = "VCEngine/PUP.Win32.VPNMaster.Gen"
+        description = "Wykryto potencjalnie niechciane oprogramowanie (PUP) - VPN Proxy Master. Program może spowalniać system i gromadzić dane o aktywności sieciowej."
+    strings:
+        $s1 = "VPN Proxy Master" ascii nocase
+        $s2 = "vpnmaster.com" ascii nocase
+        $s3 = "VPNProxyMaster.exe" ascii nocase
+        $s4 = "CloudVPN" ascii nocase
+        $s5 = "vpnproxy_service" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+rule VCEngine_PUP_MyCleanPC {
+    meta:
+        display_name = "VCEngine/PUP.Win32.MyCleanPC"
+        description = "Wykryto MyClean PC - program typu Scareware, który wyolbrzymia problemy systemowe, aby wymusić zakup licencji."
+    strings:
+        $s1 = "MyCleanPC" ascii nocase
+        $s2 = "MyCleanPC.exe" ascii nocase
+        $s3 = "CyberDefender" ascii nocase
+        $s4 = "Your PC is infected" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+rule VCEngine_PUP_DriverPack_Notifier {
+    meta:
+        display_name = "VCEngine/PUP.Win32.DriverPack"
+        description = "Wykryto DriverPack Solution. Program często instaluje niechciane dodatki, przeglądarki i zmienia ustawienia systemowe bez wyraźnej zgody."
+    strings:
+        $d1 = "DriverPack" ascii nocase
+        $d2 = "drp.su" ascii nocase
+        $d3 = "DriverPackNotifier.exe" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+rule VCEngine_PUP_WinZip_Registry_Optimizer {
+    meta:
+        display_name = "VCEngine/PUP.Win32.WinZipOptimizer"
+        description = "Wykryto WinZip Registry Optimizer. Program agresywnie namawia do naprawy błędów rejestru, co może być ryzykowne dla stabilności systemu."
+    strings:
+        $w1 = "WinZip Computing" ascii nocase
+        $w2 = "Registry Optimizer" ascii nocase
+        $w3 = "wzro.exe" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (all of them)
+}
+
+
+
+
+rule VCEngine_PUP_Restoro_Reimage {
+    meta:
+        display_name = "VCEngine/PUP.Win32.Restoro"
+        description = "Wykryto Restoro/Reimage Repair. Program typu Scareware, który straszy uszkodzeniem systemu Windows, aby wyłudzić opłatę za naprawę."
+    strings:
+        $r1 = "Restoro" ascii nocase
+        $r2 = "Reimage Repair" ascii nocase
+        $r3 = "reimageplus.com" ascii nocase
+        $r4 = "restoro.com" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_SlimCleaner {
+    meta:
+        display_name = "VCEngine/PUP.Win32.SlimCleaner"
+        description = "Wykryto SlimCleaner Plus. Program uciążliwy, który często spowalnia system i wyświetla natrętne powiadomienia o optymalizacji."
+    strings:
+        $s1 = "SlimCleaner" ascii nocase
+        $s2 = "SlimWare Utilities" ascii nocase
+        $s3 = "SlimCleanerPlus.exe" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+
+
+rule VCEngine_PUP_Wondershare_Helper {
+    meta:
+        display_name = "VCEngine/PUP.Win32.WondershareHelper"
+        description = "Wykryto Wondershare Helper Compact. Pozostałość po programach Wondershare, która działa w tle, zużywa RAM i jest trudna do usunięcia."
+    strings:
+        $w1 = "Wondershare Helper Compact" ascii nocase
+        $w2 = "WSHelper.exe" ascii nocase
+        $w3 = "WsHelperService" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_DriverBooster_Unofficial {
+    meta:
+        display_name = "VCEngine/PUP.Win32.DriverBooster"
+        description = "Wykryto nieoficjalną lub zmodyfikowaną wersję Driver Booster. Może zawierać dodatkowe Adware lub niechciane paski narzędzi."
+    strings:
+        $d1 = "Driver Booster" ascii nocase
+        $d2 = "IObit" ascii nocase
+        $d3 = "DriverBooster.exe" ascii nocase
+        $d4 = "Advanced SystemCare" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (all of ($d1, $d2))
+}
+
+rule VCEngine_Adware_OpenCandy {
+    meta:
+        display_name = "VCEngine/Adware.Win32.OpenCandy"
+        description = "Wykryto OpenCandy. Moduł instalujący niechciane oprogramowanie bez zgody użytkownika."
+    strings:
+        $s1 = "OpenCandy" ascii nocase
+        $s2 = "ocsetupHlp.dll" ascii nocase
+        $s3 = "api.opencandy.com" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_ByteFence {
+    meta:
+        display_name = "VCEngine/PUP.Win32.ByteFence"
+        description = "Wykryto ByteFence. Program zmieniający ustawienia wyszukiwania i instalowany bez wiedzy użytkownika."
+    strings:
+        $b1 = "ByteFence" ascii nocase
+        $b2 = "bytefence.com" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_Segurazo {
+    meta:
+        display_name = "VCEngine/PUP.Win32.Segurazo"
+        description = "Wykryto Segurazo (SAntivirus). Agresywny program Scareware trudny do usunięcia."
+    strings:
+        $a1 = "Segurazo" ascii nocase
+        $a2 = "SAntivirus" ascii nocase
+        $a3 = "SegurazoUninstaller.exe" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_IObit_Nagware {
+    meta:
+        display_name = "VCEngine/PUP.Win32.IObitSpammer"
+        description = "Wykryto moduły IObit wyświetlające agresywne reklamy i powiadomienia."
+    strings:
+        $io1 = "IObit Uninstaller" ascii nocase
+        $io2 = "LiveUpdate.exe" ascii nocase
+        $io3 = "Promote" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (all of them)
+}
+
+rule VCEngine_PUP_PC_SpeedUp {
+    meta:
+        display_name = "VCEngine/PUP.Win32.PCSpeedUp"
+        description = "Wykryto fałszywy optymalizator systemu PC Speed Up."
+    strings:
+        $p1 = "PC Speed Up" ascii nocase
+        $p2 = "pcspeedup.exe" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_PUP_DriverPack_Manual {
+    meta:
+        display_name = "VCEngine/PUP.Win32.DriverPack"
+        description = "Wykryto DriverPack Solution. Instaluje zbędne sterowniki i oprogramowanie trzecie."
+    strings:
+        $dr1 = "DriverPack" ascii nocase
+        $dr2 = "drp.su" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (all of them)
+}
+
+rule VCEngine_FakeAV_Legacy_2000 {
+    meta:
+        display_name = "VCEngine/FakeAV.Win32.LegacyGen"
+        description = "Wykryto klasyczny fałszywy antywirus (FakeAV). Program imituje skanowanie i wyświetla nieprawdziwe komunikaty o infekcjach."
+    strings:
+        $a1 = "Antivirus 2000" ascii nocase
+        $a2 = "Antivirus 2009" ascii nocase
+        $a3 = "XP Antivirus" ascii nocase
+        $a4 = "Your computer is infected!" ascii nocase
+        $a5 = "System Tool" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_FakeAV_SystemCare {
+    meta:
+        display_name = "VCEngine/FakeAV.Win32.SystemCare"
+        description = "Wykryto System Care Antivirus. Agresywny FakeAV blokujący narzędzia systemowe i wymuszający płatność."
+    strings:
+        $s1 = "System Care Antivirus" ascii nocase
+        $s2 = "scantime" ascii nocase
+        $s3 = "pay for full version" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (2 of them)
+}
+
+rule VCEngine_FakeAV_Win7_Protect {
+    meta:
+        display_name = "VCEngine/FakeAV.Win32.Win7Protect"
+        description = "Wykryto podróbkę narzędzia Windows Security Center. Wykorzystuje interfejs systemowy do oszustwa."
+    strings:
+        $w1 = "Windows 7 Antivirus" ascii nocase
+        $w2 = "Windows XP Antivirus" ascii nocase
+        $w3 = "Windows Protection Suite" ascii nocase
+        $w4 = "Security Tool" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
+rule VCEngine_FakeAV_SmartFortress {
+    meta:
+        display_name = "VCEngine/FakeAV.Win32.SmartFortress"
+        description = "Wykryto Smart Fortress 2012. Fałszywe oprogramowanie zabezpieczające blokujące uruchamianie aplikacji."
+    strings:
+        $sf1 = "Smart Fortress 2012" ascii nocase
+        $sf2 = "SmartFortress" ascii nocase
+        $sf3 = "Infection found!" ascii nocase
+    condition:
+        (uint16(0) == 0x5A4D) and (1 of them)
+}
+
