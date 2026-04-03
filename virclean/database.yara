@@ -8,7 +8,7 @@ rule VCEngine_Trojan_Bat_ForkBomb_Gen
         $start = /start\s+("%~nx0"|%0|%~f0)/ nocase
         $goto = /goto\s+:[a-zA-Z0-9_-]+/ nocase
     condition:
-        filesize < 2KB and all of them
+        filesize < 1KB and all of them
 }
 
 rule VCEngine_NPE_HarmTool_Enhanced
@@ -19,10 +19,10 @@ rule VCEngine_NPE_HarmTool_Enhanced
     strings:
         $header = "Symantec Corporation" nocase wide ascii
         $product = "Norton Power Eraser" nocase wide ascii
-        $internal = "NPE.exe" nocase wide ascii
+        $internal = "NPE.exe" nocase wide ascii fullword
         $cert = "Symantec SHA256 TimeStamping Signer" wide
     condition:
-        uint16(0) == 0x5A4D and 3 of them
+        uint16(0) == 0x5A4D and all of them
 }
 
 rule VCEngine_PUP_Security_Software_Setup
@@ -32,12 +32,12 @@ rule VCEngine_PUP_Security_Software_Setup
         description = "Wykrywa instalatory oprogramowania zabezpieczającego firm trzecich"
     strings:
         $m1 = "McAfee, LLC" nocase wide ascii
-        $m2 = "mclinst.exe" nocase wide ascii
+        $m2 = "mclinst.exe" nocase wide ascii fullword
         $n1 = "Symantec Corporation" nocase wide ascii
-        $n2 = "NSDownloader.exe" nocase wide ascii
+        $n2 = "NSDownloader.exe" nocase wide ascii fullword
         $n3 = "NortonDownloadManager" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and (2 of them)
+        uint16(0) == 0x5A4D and (4 of them)
 }
 
 rule VCEngine_Exploit_Gen
@@ -47,13 +47,13 @@ rule VCEngine_Exploit_Gen
         description = "Wykrywa ogólne wzorce exploitów i shellcode"
     strings:
         $ds = "DarkSword" nocase wide ascii
-        $p2 = "VirtualAlloc" ascii
-        $p3 = "WriteProcessMemory" ascii
-        $p4 = "CreateRemoteThread" ascii
+        $p2 = "VirtualAlloc" ascii fullword
+        $p3 = "WriteProcessMemory" ascii fullword
+        $p4 = "CreateRemoteThread" ascii fullword
         $pay = /payload|shellcode|reverse_shell/ nocase
     condition:
         (uint16(0) == 0x5A4D or uint16(0) == 0x4B50) and 
-        ($ds or (3 of ($p*)) or (all of ($pay)))
+        ($ds and (all of ($p*)) and $pay)
 }
 
 rule VCEngine_Suspicious_Web_Downloader
@@ -62,13 +62,13 @@ rule VCEngine_Suspicious_Web_Downloader
         display_name = "VCEngine/Heur.Suspicious.WebDownloader"
         description = "Wykrywa podejrzane skrypty pobierające pliki z sieci"
     strings:
-        $s1 = "Net.WebClient" nocase
-        $s2 = "DownloadFile" nocase
-        $s3 = "Invoke-Expression" nocase
-        $s4 = "IEX" nocase
-        $s5 = "WScript.Shell" nocase
+        $s1 = "Net.WebClient" nocase fullword
+        $s2 = "DownloadFile" nocase fullword
+        $s3 = "Invoke-Expression" nocase fullword
+        $s4 = "IEX" nocase fullword
+        $s5 = "WScript.Shell" nocase fullword
     condition:
-        3 of them
+        all of them
 }
 
 rule VCEngine_Heur_Double_Extension
@@ -82,7 +82,7 @@ rule VCEngine_Heur_Double_Extension
         $s3 = ".xlsx.exe" nocase
         $s4 = ".txt.exe" nocase
     condition:
-        uint16(0) == 0x5A4D and any of them
+        uint16(0) == 0x5A4D and (filesize < 5MB) and any of them
 }
 
 rule VCEngine_Worm_AutoCopy_Behavior
@@ -91,12 +91,12 @@ rule VCEngine_Worm_AutoCopy_Behavior
         display_name = "VCEngine/Worm.Win32.AutoCopy"
         description = "Wykrywa zachowania typowe dla robaków (kopiowanie do autostartu)"
     strings:
-        $c1 = "copy /y" nocase
+        $c1 = "copy /y" nocase fullword
         $c2 = "AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup" nocase
-        $c3 = "wscript.shell" nocase
-        $c4 = "FileSystemObject" nocase
+        $c3 = "wscript.shell" nocase fullword
+        $c4 = "FileSystemObject" nocase fullword
     condition:
-        all of ($c1, $c2) or (all of ($c3, $c4))
+        all of them
 }
 
 rule VCEngine_Suspicious_PowerShell_Encoded
@@ -105,10 +105,10 @@ rule VCEngine_Suspicious_PowerShell_Encoded
         display_name = "VCEngine/Heur.PowerShell.EncodedCommand"
         description = "Wykrywa zakodowane komendy PowerShell"
     strings:
-        $ps = "powershell" nocase
+        $ps = "powershell" nocase fullword
         $enc = " -enc " nocase
         $e = " -EncodedCommand " nocase
-        $b64 = /([A-Za-z0-9+\/]{40,})/
+        $b64 = /([A-Za-z0-9+\/]{64,})/
     condition:
         $ps and ($enc or $e) and $b64
 }
@@ -122,11 +122,11 @@ rule VCEngine_Trojan_JS_Kryptik_Heur
         $s1 = "eval(unescape(" nocase
         $s2 = "String.fromCharCode" nocase
         $s3 = "document.write(unescape(" nocase
-        $h1 = /[a-zA-Z0-9]{300,}/ 
+        $h1 = /[a-zA-Z0-9]{500,}/ 
         $html = "<html>" nocase
         $js = "<script" nocase
     condition:
-        (filesize < 10KB) and ($html and $js) and (any of ($s*) or $h1)
+        (filesize < 50KB) and ($html and $js) and (all of ($s*) and $h1)
 }
 
 rule VCEngine_Trojan_HTML_FakeCaptcha_U
@@ -136,22 +136,17 @@ rule VCEngine_Trojan_HTML_FakeCaptcha_U
         description = "Wykrywa fałszywe strony weryfikacji CAPTCHA używane do phishingu"
         author = "VCEngine"
     strings:
-        // Słowa kluczowe na fałszywych stronach weryfikacji
         $s1 = "reCAPTCHA" nocase
         $s2 = "Verify you are human" nocase
         $s3 = "Click allow to verify" nocase
-        
-        // Elementy kodu udającego mechanizmy Google
         $g1 = "www.google.com/recaptcha/api.js" nocase
         $g2 = "g-recaptcha" nocase
-        
-        // Podejrzane skrypty przekierowujące lub kopiujące do schowka
         $p1 = "navigator.clipboard.writeText" nocase
         $p2 = "powershell -Command" nocase
         $p3 = "location.replace" nocase
     condition:
-        (uint16(0) == 0x3c68 or uint16(0) == 0x3c21) and // Nagłówki HTML: <html> lub <!DO
-        (any of ($s*) and any of ($g*) or any of ($p*))
+        (uint16(0) == 0x3c68 or uint16(0) == 0x3c21) and 
+        (all of ($s*) and all of ($g*) and all of ($p*))
 }
 
 rule VCEngine_PUP_OperaGX_A
@@ -162,10 +157,10 @@ rule VCEngine_PUP_OperaGX_A
     strings:
         $s1 = "Opera GX" nocase wide ascii
         $s2 = "Opera Software" nocase wide ascii
-        $s3 = "OperaGXSetup.exe" nocase wide ascii
+        $s3 = "OperaGXSetup.exe" nocase wide ascii fullword
         $s4 = "Opera Installer" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and (3 of them)
+        uint16(0) == 0x5A4D and (all of them)
 }
 
 rule VCEngine_Ransomware_Generic_A
@@ -177,11 +172,11 @@ rule VCEngine_Ransomware_Generic_A
         $s1 = "all your files have been encrypted" nocase wide ascii
         $s2 = "your documents, photos, databases and other important files" nocase wide ascii
         $s3 = "decrypt_instructions" nocase wide ascii
-        $s4 = "TOR browser" nocase wide ascii
-        $s5 = ".onion" nocase wide ascii
+        $s4 = "TOR browser" nocase wide ascii fullword
+        $s5 = ".onion" nocase wide ascii fullword
         $s6 = "unique ID" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and 3 of them
+        uint16(0) == 0x5A4D and (5 of them)
 }
 
 rule VCEngine_Spyware_Stealer_Heur
@@ -190,16 +185,16 @@ rule VCEngine_Spyware_Stealer_Heur
         display_name = "VCEngine/Spyware.Win32.Stealer.Heur"
         description = "Wykrywa próby dostępu do wrażliwych danych przeglądarek (hasła, pliki cookies)"
     strings:
-        $b1 = "Login Data" ascii // Chrome/Edge passwords
-        $b2 = "Web Data" ascii
-        $b3 = "Cookies" ascii
+        $b1 = "Login Data" ascii fullword
+        $b2 = "Web Data" ascii fullword
+        $b3 = "Cookies" ascii fullword
         $b4 = "\\Google\\Chrome\\User Data" nocase wide ascii
         $b5 = "\\Microsoft\\Edge\\User Data" nocase wide ascii
         $s1 = "ftp://" nocase
         $s2 = "smtp://" nocase
-        $s3 = "Content-Disposition: form-data; name=\"file\"" // Próba wysłania pliku przez HTTP POST
+        $s3 = "Content-Disposition: form-data; name=\"file\"" 
     condition:
-        uint16(0) == 0x5A4D and (2 of ($b*)) and (any of ($s*))
+        uint16(0) == 0x5A4D and (4 of ($b*)) and (any of ($s*))
 }
 
 rule VCEngine_Adware_Generic_B
@@ -208,14 +203,14 @@ rule VCEngine_Adware_Generic_B
         display_name = "VCEngine/Adware.Win32.Generic.B"
         description = "Wykrywa agresywne komponenty reklamowe i śledzące"
     strings:
-        $a1 = "adware" nocase
-        $a2 = "trackers" nocase
-        $a3 = "offerbox" nocase
-        $a4 = "open-candy" nocase
-        $a5 = "installcore" nocase
+        $a1 = "adware" nocase fullword
+        $a2 = "trackers" nocase fullword
+        $a3 = "offerbox" nocase fullword
+        $a4 = "open-candy" nocase fullword
+        $a5 = "installcore" nocase fullword
         $h1 = "http://api.external-ads.com" nocase
     condition:
-        uint16(0) == 0x5A4D and 2 of them
+        uint16(0) == 0x5A4D and (all of them)
 }
 
 rule VCEngine_Spyware_Keylogger_Gen {
@@ -223,12 +218,12 @@ rule VCEngine_Spyware_Keylogger_Gen {
         display_name = "VCEngine/Spyware.Win32.Keylogger"
         description = "Wykryto funkcje śledzenia klawiatury (Keylogging) używane do kradzieży haseł."
     strings:
-        $f1 = "SetWindowsHookEx" ascii
-        $f2 = "GetAsyncKeyState" ascii
-        $f3 = "GetForegroundWindow" ascii
-        $f4 = "keylog" ascii nocase
+        $f1 = "SetWindowsHookEx" ascii fullword
+        $f2 = "GetAsyncKeyState" ascii fullword
+        $f3 = "GetForegroundWindow" ascii fullword
+        $f4 = "keylog" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (3 of ($f1, $f2, $f3, $f4))
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_Spyware_ScreenCapture {
@@ -236,12 +231,12 @@ rule VCEngine_Spyware_ScreenCapture {
         display_name = "VCEngine/Spyware.Win32.ScreenSpy"
         description = "Wykryto próby wykonywania zrzutów ekranu bez wiedzy użytkownika."
     strings:
-        $g1 = "CreateCompatibleBitmap" ascii
-        $g2 = "BitBlt" ascii
-        $g3 = "GetDC" ascii
-        $g4 = "capCreateCaptureWindow" ascii
+        $g1 = "CreateCompatibleBitmap" ascii fullword
+        $g2 = "BitBlt" ascii fullword
+        $g3 = "GetDC" ascii fullword
+        $g4 = "capCreateCaptureWindow" ascii fullword
     condition:
-        all of them
+        uint16(0) == 0x5A4D and all of them
 }
 
 rule VCEngine_Infostealer_Browser_Paths {
@@ -252,11 +247,11 @@ rule VCEngine_Infostealer_Browser_Paths {
         $p1 = "\\Google\\Chrome\\User Data" ascii nocase
         $p2 = "\\Opera Software\\Opera GX" ascii nocase
         $p3 = "\\Microsoft\\Edge\\User Data" ascii nocase
-        $p4 = "Login Data" ascii nocase
-        $p5 = "Web Data" ascii nocase
-        $p6 = "Cookies" ascii nocase
+        $p4 = "Login Data" ascii nocase fullword
+        $p5 = "Web Data" ascii nocase fullword
+        $p6 = "Cookies" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (2 of ($p1, $p2, $p3) and 1 of ($p4, $p5, $p6))
+        (uint16(0) == 0x5A4D) and (all of ($p1, $p2, $p3) and all of ($p4, $p5, $p6))
 }
 
 rule VCEngine_Infostealer_Discord_Token {
@@ -266,10 +261,10 @@ rule VCEngine_Infostealer_Discord_Token {
     strings:
         $d1 = "discordapp.com/api/v" ascii nocase
         $d2 = "Local Storage\\leveldb" ascii nocase
-        $d3 = "tokens.txt" ascii nocase
+        $d3 = "tokens.txt" ascii nocase fullword
         $regex_token = /[a-zA-Z0-9_-]{24}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27}/
     condition:
-        2 of ($d1, $d2, $d3) or $regex_token
+        all of ($d*) and $regex_token
 }
 
 rule VCEngine_Miner_Crypto_Gen {
@@ -277,12 +272,12 @@ rule VCEngine_Miner_Crypto_Gen {
         display_name = "VCEngine/Miner.Win32.Cryptonight"
         description = "Wykryto koparkę kryptowalut obciążającą procesor i kartę graficzną."
     strings:
-        $m1 = "cryptonight" ascii nocase
+        $m1 = "cryptonight" ascii nocase fullword
         $m2 = "stratum+tcp://" ascii nocase
-        $m3 = "xmrig" ascii nocase
+        $m3 = "xmrig" ascii nocase fullword
         $m4 = "mine.moneropool.com" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_VPNProxyMaster {
@@ -292,11 +287,11 @@ rule VCEngine_PUP_VPNProxyMaster {
     strings:
         $s1 = "VPN Proxy Master" ascii nocase
         $s2 = "vpnmaster.com" ascii nocase
-        $s3 = "VPNProxyMaster.exe" ascii nocase
+        $s3 = "VPNProxyMaster.exe" ascii nocase fullword
         $s4 = "CloudVPN" ascii nocase
-        $s5 = "vpnproxy_service" ascii nocase
+        $s5 = "vpnproxy_service" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (4 of them)
 }
 
 rule VCEngine_PUP_MyCleanPC {
@@ -305,11 +300,11 @@ rule VCEngine_PUP_MyCleanPC {
         description = "Wykryto MyClean PC - program typu Scareware, który wyolbrzymia problemy systemowe, aby wymusić zakup licencji."
     strings:
         $s1 = "MyCleanPC" ascii nocase
-        $s2 = "MyCleanPC.exe" ascii nocase
+        $s2 = "MyCleanPC.exe" ascii nocase fullword
         $s3 = "CyberDefender" ascii nocase
         $s4 = "Your PC is infected" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_DriverPack_Notifier {
@@ -319,9 +314,9 @@ rule VCEngine_PUP_DriverPack_Notifier {
     strings:
         $d1 = "DriverPack" ascii nocase
         $d2 = "drp.su" ascii nocase
-        $d3 = "DriverPackNotifier.exe" ascii nocase
+        $d3 = "DriverPackNotifier.exe" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_WinZip_Registry_Optimizer {
@@ -331,13 +326,10 @@ rule VCEngine_PUP_WinZip_Registry_Optimizer {
     strings:
         $w1 = "WinZip Computing" ascii nocase
         $w2 = "Registry Optimizer" ascii nocase
-        $w3 = "wzro.exe" ascii nocase
+        $w3 = "wzro.exe" ascii nocase fullword
     condition:
         (uint16(0) == 0x5A4D) and (all of them)
 }
-
-
-
 
 rule VCEngine_PUP_Restoro_Reimage {
     meta:
@@ -349,7 +341,7 @@ rule VCEngine_PUP_Restoro_Reimage {
         $r3 = "reimageplus.com" ascii nocase
         $r4 = "restoro.com" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_SlimCleaner {
@@ -359,12 +351,10 @@ rule VCEngine_PUP_SlimCleaner {
     strings:
         $s1 = "SlimCleaner" ascii nocase
         $s2 = "SlimWare Utilities" ascii nocase
-        $s3 = "SlimCleanerPlus.exe" ascii nocase
+        $s3 = "SlimCleanerPlus.exe" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
-
-
 
 rule VCEngine_PUP_Wondershare_Helper {
     meta:
@@ -372,10 +362,10 @@ rule VCEngine_PUP_Wondershare_Helper {
         description = "Wykryto Wondershare Helper Compact. Pozostałość po programach Wondershare, która działa w tle, zużywa RAM i jest trudna do usunięcia."
     strings:
         $w1 = "Wondershare Helper Compact" ascii nocase
-        $w2 = "WSHelper.exe" ascii nocase
-        $w3 = "WsHelperService" ascii nocase
+        $w2 = "WSHelper.exe" ascii nocase fullword
+        $w3 = "WsHelperService" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_DriverBooster_Unofficial {
@@ -384,11 +374,11 @@ rule VCEngine_PUP_DriverBooster_Unofficial {
         description = "Wykryto nieoficjalną lub zmodyfikowaną wersję Driver Booster. Może zawierać dodatkowe Adware lub niechciane paski narzędzi."
     strings:
         $d1 = "Driver Booster" ascii nocase
-        $d2 = "IObit" ascii nocase
-        $d3 = "DriverBooster.exe" ascii nocase
+        $d2 = "IObit" ascii nocase fullword
+        $d3 = "DriverBooster.exe" ascii nocase fullword
         $d4 = "Advanced SystemCare" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (all of ($d1, $d2))
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_Adware_OpenCandy {
@@ -396,11 +386,11 @@ rule VCEngine_Adware_OpenCandy {
         display_name = "VCEngine/Adware.Win32.OpenCandy"
         description = "Wykryto OpenCandy. Moduł instalujący niechciane oprogramowanie bez zgody użytkownika."
     strings:
-        $s1 = "OpenCandy" ascii nocase
-        $s2 = "ocsetupHlp.dll" ascii nocase
+        $s1 = "OpenCandy" ascii nocase fullword
+        $s2 = "ocsetupHlp.dll" ascii nocase fullword
         $s3 = "api.opencandy.com" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_ByteFence {
@@ -408,10 +398,10 @@ rule VCEngine_PUP_ByteFence {
         display_name = "VCEngine/PUP.Win32.ByteFence"
         description = "Wykryto ByteFence. Program zmieniający ustawienia wyszukiwania i instalowany bez wiedzy użytkownika."
     strings:
-        $b1 = "ByteFence" ascii nocase
+        $b1 = "ByteFence" ascii nocase fullword
         $b2 = "bytefence.com" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_Segurazo {
@@ -419,11 +409,11 @@ rule VCEngine_PUP_Segurazo {
         display_name = "VCEngine/PUP.Win32.Segurazo"
         description = "Wykryto Segurazo (SAntivirus). Agresywny program Scareware trudny do usunięcia."
     strings:
-        $a1 = "Segurazo" ascii nocase
-        $a2 = "SAntivirus" ascii nocase
-        $a3 = "SegurazoUninstaller.exe" ascii nocase
+        $a1 = "Segurazo" ascii nocase fullword
+        $a2 = "SAntivirus" ascii nocase fullword
+        $a3 = "SegurazoUninstaller.exe" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_IObit_Nagware {
@@ -432,8 +422,8 @@ rule VCEngine_PUP_IObit_Nagware {
         description = "Wykryto moduły IObit wyświetlające agresywne reklamy i powiadomienia."
     strings:
         $io1 = "IObit Uninstaller" ascii nocase
-        $io2 = "LiveUpdate.exe" ascii nocase
-        $io3 = "Promote" ascii nocase
+        $io2 = "LiveUpdate.exe" ascii nocase fullword
+        $io3 = "Promote" ascii nocase fullword
     condition:
         (uint16(0) == 0x5A4D) and (all of them)
 }
@@ -444,9 +434,9 @@ rule VCEngine_PUP_PC_SpeedUp {
         description = "Wykryto fałszywy optymalizator systemu PC Speed Up."
     strings:
         $p1 = "PC Speed Up" ascii nocase
-        $p2 = "pcspeedup.exe" ascii nocase
+        $p2 = "pcspeedup.exe" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_PUP_DriverPack_Manual {
@@ -465,13 +455,13 @@ rule VCEngine_FakeAV_Legacy_2000 {
         display_name = "VCEngine/FakeAV.Win32.LegacyGen"
         description = "Wykryto klasyczny fałszywy antywirus (FakeAV). Program imituje skanowanie i wyświetla nieprawdziwe komunikaty o infekcjach."
     strings:
-        $a1 = "Antivirus 2000" ascii nocase
-        $a2 = "Antivirus 2009" ascii nocase
-        $a3 = "XP Antivirus" ascii nocase
+        $a1 = "Antivirus 2000" ascii nocase fullword
+        $a2 = "Antivirus 2009" ascii nocase fullword
+        $a3 = "XP Antivirus" ascii nocase fullword
         $a4 = "Your computer is infected!" ascii nocase
-        $a5 = "System Tool" ascii nocase
+        $a5 = "System Tool" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (3 of them)
 }
 
 rule VCEngine_FakeAV_SystemCare {
@@ -480,10 +470,10 @@ rule VCEngine_FakeAV_SystemCare {
         description = "Wykryto System Care Antivirus. Agresywny FakeAV blokujący narzędzia systemowe i wymuszający płatność."
     strings:
         $s1 = "System Care Antivirus" ascii nocase
-        $s2 = "scantime" ascii nocase
+        $s2 = "scantime" ascii nocase fullword
         $s3 = "pay for full version" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (2 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
 
 rule VCEngine_FakeAV_Win7_Protect {
@@ -494,9 +484,9 @@ rule VCEngine_FakeAV_Win7_Protect {
         $w1 = "Windows 7 Antivirus" ascii nocase
         $w2 = "Windows XP Antivirus" ascii nocase
         $w3 = "Windows Protection Suite" ascii nocase
-        $w4 = "Security Tool" ascii nocase
+        $w4 = "Security Tool" ascii nocase fullword
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (2 of them)
 }
 
 rule VCEngine_FakeAV_SmartFortress {
@@ -505,9 +495,8 @@ rule VCEngine_FakeAV_SmartFortress {
         description = "Wykryto Smart Fortress 2012. Fałszywe oprogramowanie zabezpieczające blokujące uruchamianie aplikacji."
     strings:
         $sf1 = "Smart Fortress 2012" ascii nocase
-        $sf2 = "SmartFortress" ascii nocase
+        $sf2 = "SmartFortress" ascii nocase fullword
         $sf3 = "Infection found!" ascii nocase
     condition:
-        (uint16(0) == 0x5A4D) and (1 of them)
+        (uint16(0) == 0x5A4D) and (all of them)
 }
-
