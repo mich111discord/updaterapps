@@ -15,14 +15,25 @@ rule VCEngine_NPE_HarmTool_Enhanced
 {
     meta:
         display_name = "VCEngine/Tool.Win32.NPE.Harmful"
-        description = "Wykrywa Norton Power Eraser jako narzędzie niepożądane"
+        description = "Wykrywa Norton Power Eraser (Symantec / NortonLifeLock / Gen Digital)"
+        author = "VCEngine"
+
     strings:
-        $header = "Symantec Corporation" nocase wide ascii
+        $corp1 = "Symantec Corporation" nocase wide ascii
+        $corp2 = "NortonLifeLock Inc." nocase wide ascii
+        $corp3 = "Gen Digital Inc" nocase wide ascii
+
         $product = "Norton Power Eraser" nocase wide ascii
         $internal = "NPE.exe" nocase wide ascii fullword
-        $cert = "Symantec SHA256 TimeStamping Signer" wide
+
+        $cert1 = "Symantec SHA256 TimeStamping Signer" wide
+        $cert2 = "DigiCert Trusted G4 Code Signing" wide
+        $cert3 = "NortonLifeLock Code Signing" wide ascii
+
     condition:
-        uint16(0) == 0x5A4D and all of them
+        uint16(0) == 0x5A4D and 
+        ($product and $internal) and 
+        (any of ($corp*) or any of ($cert*))
 }
 
 rule VCEngine_PUP_Security_Software_Setup
