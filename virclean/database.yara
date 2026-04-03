@@ -1,52 +1,58 @@
 rule VCEngine_Trojan_Bat_ForkBomb_Gen
 {
     strings:
-        $a = /start\s+/ nocase
-        $b = /:[a-zA-Z0-9]+/
-        $c = /goto\s+[a-zA-Z0-9]+/ nocase
+        $label = /:[a-zA-Z0-9_-]+/
+        $start = /start\s+("%~nx0"|%0|%~f0)/ nocase
+        $goto = /goto\s+:[a-zA-Z0-9_-]+/ nocase
     condition:
-        all of them
+        filesize < 2KB and all of them
 }
 
-rule VCEngine_NPE_HarmTool_Gen
+rule VCEngine_NPE_HarmTool_Enhanced
 {
     strings:
-        $s1 = "Norton" nocase wide ascii
-        $s2 = "Power Eraser" nocase wide ascii
+        $header = "Symantec Corporation" nocase wide ascii
+        $product = "Norton Power Eraser" nocase wide ascii
+        $internal = "NPE.exe" nocase wide ascii
+        $cert = "Symantec SHA256 TimeStamping Signer" wide
     condition:
-        $s1 or $s2
+        uint16(0) == 0x5A4D and 3 of them
 }
 
-rule VCEngine_PUP_McAfee_Setup
+rule VCEngine_PUP_Security_Software_Setup
 {
     strings:
-        $m1 = "McAfee" nocase wide ascii
-        $m2 = "mclinst" nocase wide ascii
-        $m3 = "McUICnt" nocase wide ascii
+        $m1 = "McAfee, LLC" nocase wide ascii
+        $m2 = "mclinst.exe" nocase wide ascii
+        $n1 = "Symantec Corporation" nocase wide ascii
+        $n2 = "NSDownloader.exe" nocase wide ascii
+        $n3 = "NortonDownloadManager" nocase wide ascii
     condition:
-        uint16(0) == 0x5A4D and any of them
+        uint16(0) == 0x5A4D and (2 of them)
 }
 
-rule VCEngine_PUP_Norton_Setup
+rule VCEngine_Exploit_A
 {
     strings:
-        $n1 = "Norton" nocase wide ascii
-        $n2 = "Symantec" nocase wide ascii
-        $n3 = "NSDownloader" nocase wide ascii
+        $ds = "DarkSword" nocase wide ascii
+        $p1 = "kernel32.dll" nocase
+        $p2 = "VirtualAlloc" ascii
+        $p3 = "WriteProcessMemory" ascii
+        $p4 = "CreateRemoteThread" ascii
+        $pay = /payload|shellcode|reverse_shell/ nocase
     condition:
-        uint16(0) == 0x5A4D and any of them
+        (uint16(0) == 0x5A4D or uint16(0) == 0x4B50) and 
+        ($ds or (3 of ($p*)) or (all of ($pay)))
 }
 
-rule VCEngine_Exploit_Gen_A
+rule VCEngine_Suspicious_Web_Downloader
 {
     strings:
-        $s1 = "DarkSword" nocase wide ascii
-        $s2 = "payload" nocase wide ascii
-        $s3 = "reverse_shell" nocase wide ascii
-        $s4 = "exploit" nocase wide ascii
-        $s5 = "RCE" nocase wide ascii
-        $s6 = "shellcode" nocase wide ascii
-        $s7 = "bypass" nocase wide ascii
+        $s1 = "Net.WebClient" nocase
+        $s2 = "DownloadFile" nocase
+        $s3 = "Invoke-Expression" nocase
+        $s4 = "IEX" nocase
+        $s5 = "WScript.Shell" nocase
     condition:
-        (uint16(0) == 0x5A4D or uint16(0) == 0x4B50) and (2 of them)
+        3 of them
 }
