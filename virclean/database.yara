@@ -35,7 +35,6 @@ rule VCEngine_Exploit_RCE_DarkSword_Strict
 {
     strings:
         $ds = "DarkSword" nocase wide ascii
-        $p1 = "kernel32.dll" nocase
         $p2 = "VirtualAlloc" ascii
         $p3 = "WriteProcessMemory" ascii
         $p4 = "CreateRemoteThread" ascii
