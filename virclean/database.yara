@@ -511,3 +511,89 @@ rule VCEngine_FakeAV_SmartFortress {
     condition:
         (uint16(0) == 0x5A4D) and (all of them)
 }
+
+rule VCEngine_Spyware_Adups_FOTA
+{
+    meta:
+        display_name = "VCEngine/Spyware.Android.Adups"
+        description = "Wykrywa komponenty szpiegowskie firmy Adups zbierające dane prywatne"
+    strings:
+        $pkg = "com.adups.fota" ascii nocase
+        $app = "AdupsFota" ascii nocase
+        
+        $act1 = "AdSafe_pro" ascii 
+        $act2 = "com.adups.fota.sysoper.REBOOT" ascii
+        $act3 = "checkcommand" ascii
+    condition:
+        any of them
+}
+
+rule VCEngine_Backdoor_XFota_Comprehensive
+{
+    meta:
+        display_name = "VCEngine/Backdoor.Android.XFota.Network"
+        description = "Wykrywa ślady aktywności XFota na podstawie domen i parametrów URL"
+    strings:
+        
+        $d1 = "ota.xbkpota.com" ascii nocase
+        $d2 = "notes.xbkptek.com" ascii nocase
+        $d3 = "rsteptech.com" ascii nocase
+        
+       
+        $u1 = "IMSI=" ascii
+        $u2 = "UUID=OTA-" ascii
+        $u3 = "QUDAOSHANG=9106" ascii 
+        $u4 = "SOFT_VERSION=4s" ascii
+        
+        
+        $p1 = "res/drawable-hdpi/xfota.png" ascii
+        $p2 = "res/drawable-hdpi/xfota2.png" ascii
+    condition:
+        (any of ($d*)) or (3 of ($u*)) or (any of ($p*))
+}
+
+rule VCEngine_Locker_Android_HQ
+{
+    meta:
+        display_name = "VCEngine/Locker.Android.HQ"
+        description = "SARA Ransomware Detection"
+    strings:
+        $s1 = "Your phone has been locked" ascii nocase
+        $s2 = "ransomware" ascii nocase
+        $s3 = "com.sara.locker" ascii nocase
+        $s4 = "unlock_code" ascii nocase
+        $s5 = "Enter password to decrypt" ascii nocase
+    condition:
+        uint16(0) == 0x4B50 and (2 of ($s*))
+}
+
+rule VCEngine_Stealer_Chromium_Delta
+{
+    meta:
+        display_name = "VCEngine/Stealer.Chromium.Delta"
+        description = "Wykrywa szkodliwy komponent Delta Adblocker (Stealer)"
+    strings:
+        $s1 = "Delta Adblocker" ascii nocase
+        $s2 = "delta_triangle_icon" ascii nocase
+        $s3 = "red_black_shield" ascii nocase
+        $s4 = "chrome.cookies.get" ascii
+        $s5 = "chrome.identity.getProfileUserInfo" ascii
+        $s6 = "upload_stolen_data" ascii nocase
+        $s7 = "background_script_delta" ascii
+    condition:
+        (uint16(0) == 0x4B50 or uint16(0) == 0x5A4D) and (3 of ($s*))
+}
+
+rule VCEngine_Miner_WASM_Hidden
+{
+    meta:
+        display_name = "VCEngine/Miner.WASM.Hidden"
+description = "Kopie Bitcoin w przeglądarce bez wiedzy użytkownika."
+    strings:
+        $s1 = "WebAssembly.instantiate" ascii
+        $s2 = "cryptonight" ascii nocase
+        $s3 = "coinhive" ascii nocase
+        $s4 = "throttleMiner" ascii
+    condition:
+        2 of them
+}
