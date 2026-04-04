@@ -1,4 +1,4 @@
-rule VCEngine_Trojan_Bat_ForkBomb_Gen
+ rule VCEngine_Trojan_Bat_ForkBomb_Gen
 {
     meta:
         display_name = "VCEngine/Trojan.Bat.ForkBomb.Gen"
@@ -596,4 +596,17 @@ description = "Kopie Bitcoin w przeglądarce bez wiedzy użytkownika."
         $s4 = "throttleMiner" ascii
     condition:
         2 of them
+}
+
+rule VCEngine_Spyware_Keylogger_Artemis
+{
+    meta:
+        display_name = "VCEngine/Spyware.Keylogger.Artemis"
+    strings:
+        $s1 = "GetAsyncKeyState" ascii
+        $s2 = "SetWindowsHookEx" ascii
+        $s3 = "logs.txt" ascii
+        $s4 = "smtp_server" ascii
+    condition:
+        (uint16(0) == 0x5A4D) and all of them
 }
