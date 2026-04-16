@@ -1,1 +1,6 @@
-1
+{
+  "version": "1.0.0",
+  "url": "",
+  "sha256": "",
+  "changelog": "Naprawiono blokowanie reklam wideo i błędy systemu aktualizacji."
+}
