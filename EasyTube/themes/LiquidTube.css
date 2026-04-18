@@ -1,0 +1,726 @@
+/* ============================================================
+   LIQUIDTUBE FINAL: PRISM GLASS & FUZZY MASK EDITION
+   ============================================================ */
+
+:root {
+    --glass-bg: rgba(20, 20, 20, 0);
+    --spotlight-color: rgba(255, 255, 255, 0.295);
+    
+    /* Variables สำหรับเอฟเฟกต์ Prism */
+    --prism-highlight: rgba(255, 255, 255, 0.5);
+    --prism-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Theme Setup */
+html, [light] {
+    --HH: #ffffff7a;
+    --ss: rgba(255, 255, 255, 0.459);
+    --b: 1px solid rgba(255, 255, 255, 0.1); 
+    --HD: rgba(255, 255, 255, 0.349);
+}
+
+html[dark], [dark] {
+    --HH: #0000007a;
+    --ss: rgba(255, 255, 255, 0.1);
+    --b: 1px solid rgba(255, 255, 255, 0.1);
+    --HD: rgba(0, 0, 0, 0.349);
+}
+
+/* ============================================================
+   1. VIDEO PLAYER (PRISM GLASS EFFECT)
+   ============================================================ */
+.ytp-right-controls,
+.ytp-time-wrapper,
+.ytp-volume-area,
+.ytp-play-button,
+.ytp-fullscreen-quick-actions,
+.ytp-fullscreen-grid-expand-button,
+.ytp-chapter-title,
+.ytp-prev-button,
+.ytp-next-button {
+
+    /* 1. พื้นหลัง + Spotlight (คงเดิม) */
+    background: 
+        radial-gradient(
+            300px circle at var(--mouse-x) var(--mouse-y), 
+            var(--spotlight-color), 
+            transparent 40%
+        ),
+        var(--glass-bg) !important;
+        
+    backdrop-filter: blur(12px) saturate(180%) contrast(1.1) !important;
+    
+    /* 2. PRISM BEVEL (เงาเจียระไน) - แทนที่ border เดิม */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important; /* ขอบบางๆ */
+    border-radius: 100px !important;
+    
+    /* เงา Inset สร้างความลึก + เงาลอยตัว */
+    box-shadow: 
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3), /* ขอบบนสว่าง */
+        inset 0 -1px 0 0 rgba(0, 0, 0, 0.2),      /* ขอบล่างมืด */
+        0 20px 50px rgba(0,0,0,0.5) !important;   /* เงาพื้น */
+    
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+    position: relative !important;
+    overflow: visible !important; /* ต้องเปิดเพื่อให้แสงสะท้อนล้นขอบได้ */
+    z-index: 1;
+}
+
+.ytp-next-button
+ {
+    margin-left: 5px !important;
+}
+/* 3. PRISM RIM LIGHT (แสงสะท้อนขอบคมกริบ) */
+/* ใช้ ::after สร้าง Layer แสงสะท้อนทับลงไป */
+.ytp-right-controls::after,
+.ytp-time-wrapper::after,
+.ytp-volume-area::after,
+.ytp-play-button::after,
+.ytp-fullscreen-quick-actions::after,
+.ytp-fullscreen-grid-expand-button::after,
+.ytp-prev-button::after,
+.ytp-next-button::after {
+    content: "";
+    position: absolute;
+    inset: -1px; /* ให้ล้นขอบออกมานิดนึง */
+    border-radius: 100px;
+    z-index: 2;
+    pointer-events: none;
+    
+    /* ไล่สีแสงสะท้อน (เฉียง) */
+    background: linear-gradient(
+        145deg, 
+        rgba(255, 255, 255, 0.7) 0%,   /* มุมซ้ายบนสว่างจ้า */
+        rgba(255, 255, 255, 0.1) 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    
+    /* เทคนิคเจาะรู (Mask Composite) ให้เหลือแต่ขอบ */
+    padding: 1.5px; /* ความหนาของเส้นแสง */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    opacity: 0.8;
+}
+
+/* Hover Effect */
+.ytp-right-controls:hover, .ytp-play-button:hover, .ytp-volume-area:hover {
+    transform: translateY(-1px); /* ลอยขึ้น */
+    box-shadow: 
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+        0 25px 60px rgba(0,0,0,0.6) !important;
+}
+
+/* ซ่อนเงาไล่ระดับเดิม */
+.ytp-gradient-bottom, .ytp-gradient-top { display: none !important; }
+
+/* ============================================================
+   3. HEADER (คงเดิม: เบลอฟุ้งแบบ Mac Widget)
+   ============================================================ */
+#frosted-glass.ytd-app::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    background: var(--HD);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    pointer-events: none;
+    height: 200%;
+}
+
+/* ============================================================
+   SEARCH & CHIPS (PRISM EFFECT APPLIED)
+   ============================================================ */
+.ytSearchboxComponentInputBox,
+.ytSearchboxComponentSearchButton,
+.ytChipShapeInactive {
+    background: var(--ss) !important;
+    
+    /* Prism Bevel */
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    box-shadow: 
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 0 rgba(0, 0, 0, 0.1),
+        0 4px 15px rgba(0,0,0,0.1) !important;
+        
+    border-radius: 50px !important;
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
+    margin-right: 10px
+}
+
+.ytSearchboxComponentSearchButton {
+    margin: 0px 0px 0px 10px !important;
+}
+
+/* ใส่ขอบแสงให้ Search & Chips ด้วย */
+#buttons.ytd-masthead>*.ytd-masthead:not(:last-child)::after,
+#voice-search-button.ytd-masthead::after,
+.ytSearchboxComponentInputBox::after,
+.ytSearchboxComponentSearchButton::after,
+.ytChipShapeInactive::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 50px;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 50%);
+    padding: 1.5px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* ส่วนอื่นๆ คงเดิม */
+#frosted-glass.with-chipbar.ytd-app {
+    background: rgb(255 255 255 / 0%) !important;
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    pointer-events: none;
+    padding-bottom: 150px;
+}
+
+ytd-feed-filter-chip-bar-renderer[fluid-width] #chips-content.ytd-feed-filter-chip-bar-renderer {}
+#chips.ytd-feed-filter-chip-bar-renderer { padding: 5px 20px 5px 20px; }
+ytd-feed-filter-chip-bar-renderer { height: 100px !important; }
+#chips-content.ytd-feed-filter-chip-bar-renderer{ justify-content: center; }
+.ytSearchboxComponentDesktop .ytSearchboxComponentClearButton { margin-right: 6px !important; }
+
+/* Layout Fixes */
+.ytp-delhi-modern .ytp-chrome-controls .ytp-left-controls { padding-left: 20px; }
+.ytp-delhi-modern .ytp-chrome-controls { margin-left: -20px; }
+
+/* Fullscreen & Masthead */
+.ytp-fullscreen-grid-peeking .ytp-fullscreen-grid-main-content, .ytp-fullscreen-grid-active:not(.ended-mode) .ytp-fullscreen-grid-main-content {
+    backdrop-filter: blur(20px) saturate(180%) !important;
+}
+.ytp-fullscreen-grid-main-content {
+    mask-image: linear-gradient(to top, black 0%, black 90%, transparent 100%);
+    padding-top: 60px
+}
+.ytp-fullscreen-grid-active:not(.ended-mode) .ytp-fullscreen-grid, .ytp-fullscreen-grid-peeking .ytp-fullscreen-grid {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, .0) 100px, rgba(0, 0, 0, 0) 100%) !important;
+}
+#background.ytd-masthead {
+    background: var(--HH) !important;
+    mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    backdrop-filter: blur(10px);
+}
+#voice-search-button.ytd-masthead,#buttons.ytd-masthead>*.ytd-masthead:not(:last-child){
+    background-color: var(--yt-spec-additive-background);
+    backdrop-filter: blur(10px);
+    border-radius: 100px;
+}
+
+/* Sidebar Spotlight */
+#contentContainer.tp-yt-app-drawer[opened] {
+    background:
+        radial-gradient(
+            300px circle at var(--mouse-x) var(--mouse-y), 
+            var(--spotlight-color), 
+            transparent 40%
+        ),
+        var(--HH) !important;
+    backdrop-filter: blur(50px) saturate(180%) !important;
+    mask-image: linear-gradient(to right, black 0%, black 30%, transparent 100%);
+    padding-right: 300px !important;
+}
+#guide-content.ytd-app{ background: #00000000 !important; }
+#guide-inner-content.ytd-app:hover { scrollbar-color: #90909000 transparent !important; }
+#contentContainer.tp-yt-app-drawer[persistent] { width: 100%; padding-right: 0px !important; }
+#sections.ytd-guide-renderer>*.ytd-guide-renderer:not(:last-child) { border-bottom: 0px solid var(--yt-spec-outline) !important; }
+
+/* ============================================================
+   JELLY SEARCH BAR (CSS PHYSICS)
+   ============================================================ */
+
+/* 1. สร้าง Animation ให้ดูเหมือนน้ำ/เยลลี่ขยับ */
+@keyframes jelly-idle {
+    0%, 100% { border-radius: 50px 50px 50px 50px; }
+    33% { border-radius: 50px 45px 55px 50px; transform: scale(1.01) skewX(1deg); }
+    66% { border-radius: 45px 55px 50px 45px; transform: scale(0.99) skewX(-1deg); }
+}
+
+/* 2. ช่องค้นหา (Input Box) */
+.ytSearchboxComponentInputBox,
+#search-form #container {
+    /* ใช้ค่าสีเดิมของคุณ */
+    background: var(--ss) !important;
+    border: var(--b) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    
+    /* --- JELLY PHYSICS --- */
+    /* ใช้ transition แบบสปริง (Overshoot) เพื่อให้เวลาขยายมันจะเด้งเกินนิดนึงแล้วหดกลับ */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    
+    border-radius: 50px !important;
+    transform-origin: center;
+}
+
+/* 3. ปุ่มค้นหา (Search Button) */
+.ytSearchboxComponentSearchButton,
+#search-icon-legacy {
+    background: var(--ss) !important;
+    border: var(--b) !important;
+    border-radius: 50px !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    margin-left: 10px !important;
+    
+    /* JELLY PHYSICS */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* -----------------------------------------------------------
+   ACTION: HOVER (เมาส์ชี้แล้วบิดๆ เหมือนน้ำกลิ้ง)
+   ----------------------------------------------------------- */
+.ytSearchboxComponentInputBox:hover,
+.ytSearchboxComponentSearchButton:hover {
+    /* เรียกใช้ Animation เยลลี่ขยับ */
+    animation: jelly-idle 3s ease-in-out infinite;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15) !important;
+    cursor: text;
+}
+
+/* ปุ่มค้นหาชี้แล้วให้เด้งนิดนึง */
+.ytSearchboxComponentSearchButton:hover {
+    cursor: pointer;
+    transform: scale(1.1) rotate(5deg); /* เอียงนิดนึงเพิ่มความขี้เล่น */
+}
+
+/* -----------------------------------------------------------
+   ACTION: FOCUS / CLICK (คลิกแล้วขยายใหญ่เด้งดึ๋ง)
+   ----------------------------------------------------------- */
+/* เมื่อมีการคลิกพิมพ์ หรือช่องค้นหาถูกใช้งาน */
+.ytSearchboxComponentInputBox:focus-within,
+#search-form:focus-within #container {
+    /* ขยายใหญ่ขึ้นแบบเด้งๆ */
+    transform: scale(1.05) !important; 
+    
+    /* เปลี่ยนสีให้ดู Active */
+    background: var(--ss) !important; /* พื้นหลังเข้มขึ้น */
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    
+    /* หยุดขยับตอนพิมพ์ เดี๋ยวเวียนหัว */
+    animation: none !important;
+    border-radius: 25px !important; /* ปรับมุมให้เหลี่ยมขึ้นนิดนึงตอนพิมพ์จะได้ดูจริงจัง */
+}
+
+/* -----------------------------------------------------------
+   FIX: CHIPS (ปุ่มหมวดหมู่) ให้เด้งด้วย
+   ----------------------------------------------------------- */
+.ytChipShapeInactive {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+.ytChipShapeInactive:hover {
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.2) !important;
+}
+
+/* ============================================================
+   WOW FACTOR: LIQUID NEON TIMELINE
+   ============================================================ */
+
+/* 1. เปลี่ยนเส้นสีแดง ให้เป็น "แท่งนีออนเรืองแสง" */
+.ytp-play-progress {
+    /* ไล่สีจากฟ้า -> ม่วง -> ชมพู (Cyber Liquid) */
+    background: linear-gradient(90deg, 
+        #ff9100 0%, 
+        #ff0000 50%, 
+        #ff00de 100%
+    ) !important;
+    
+    /* ใส่แสงฟุ้ง (Glow) ให้เหมือนหลอดนีออน */
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7),
+                0 0 20px rgba(255, 0, 222, 0.5) !important;
+                
+    /* ลบเหลี่ยมทิ้ง */
+    border-radius: 0 50px 50px 0 !important;
+}
+
+/* 2. เปลี่ยนจุด Scrubber (ตุ่มลาก) ให้เป็น "หยดน้ำแก้ว" */
+.ytp-scrubber-button {
+    background: transparent !important; /* เจาะรูตรงกลาง */
+    border: 2px solid #fff !important;  /* ขอบขาว */
+    
+    /* ขยายใหญ่ขึ้นหน่อย */
+    transform: scale(1.3) !important;
+    
+    /* เอฟเฟกต์แก้ว + แสงสะท้อน */
+    box-shadow: 
+        inset 0 0 4px rgba(255,255,255,0.8), /* แสงข้างใน */
+        0 0 10px rgba(255, 255, 255, 0.8),   /* แสงรอบนอก */
+        0 0 20px rgba(255, 0, 0, 0.6) !important; /* แสงสีฟ้าฟุ้งๆ */
+        
+    backdrop-filter: blur(4px) !important;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* 3. ตอนเอาเมาส์ไปชี้ Scrubber (Hover) */
+.ytp-scrubber-button:hover {
+    transform: scale(1.6) !important; /* ขยายใหญ่ */
+    border-color: #00c6ff !important; /* เปลี่ยนขอบเป็นสีฟ้า */
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 4. พื้นหลังราง (Background Track) ให้ดูเป็นร่องลึก */
+.ytp-load-progress {
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+/* 5. เอฟเฟกต์โหลด (Buffer) ให้เป็นลายคลื่น */
+.ytp-load-progress:after {
+    /* สร้างลายเส้นทแยงมุมจางๆ */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+    background-size: 20px 20px;
+    opacity: 0.5;
+}
+
+/* แก้ไขขนาดและการจัดวางของปุ่ม PiP ให้เข้าพวก */
+.ytp-pip-button {
+    display: flex !important;
+    align-items: center !important; /* จัดไอคอนให้อยู่กึ่งกลางแนวตั้ง */
+    justify-content: center !important; /* จัดไอคอนให้อยู่กึ่งกลางแนวนอน */
+    box-sizing: content-box !important; /* เพื่อให้ padding ไม่ไปลดขนาดไอคอน */
+}
+
+/* ปรับขนาดของตัวไอคอน SVG ภายในปุ่ม */
+.ytp-pip-button svg {
+    width: 100% !important; /* ให้ไอคอนขยายเต็มพื้นที่ปุ่ม */
+    height: 100% !important;
+    transform: scale(1.2); /* ขยายขนาดไอคอนขึ้นอีกเล็กน้อยเพื่อให้ดูเท่ากับไอคอนอื่น */
+    transform-origin: center; /* ขยายจากจุดกึ่งกลาง */
+}
+
+/* ============================================================
+   MAC-OS STYLE FULLSCREEN ANIMATION (The Illusion)
+   ============================================================ */
+
+/* 1. สร้าง Keyframes สำหรับการ "เด้งขยาย" (Zoom In) */
+@keyframes mac-zoom-in {
+    0% {
+        transform: scale(0.95); /* เริ่มต้น: เล็กกว่าจอนิดนึง */
+        opacity: 0; /* จาง */
+        border-radius: 40px; /* มุมมนเหมือนตอนเป็น Window */
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1); /* ขยายเต็มจอ */
+        border-radius: 0; /* มุมคม */
+    }
+}
+
+/* 2. สั่งให้ทำงานเมื่อ YouTube เข้าสู่โหมด Fullscreen */
+/* YouTube จะเติม class .ytp-fullscreen ให้โดยอัตโนมัติ */
+.html5-video-player.ytp-fullscreen .html5-main-video {
+    animation: mac-zoom-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3. จัดการพื้นหลังให้มืดลงแบบ Cinematic ขณะขยาย */
+.html5-video-player.ytp-fullscreen {
+    background-color: #000 !important; /* พื้นดำสนิท */
+}
+
+/* 4. แถบควบคุม (Controls) ให้ค่อยๆ ลอยขึ้นมาทีหลัง (Delay) */
+.html5-video-player.ytp-fullscreen .ytp-chrome-bottom {
+    animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
+}
+
+@keyframes fade-in-up {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   OPTIONAL: แก้บั๊กขอบขาวเวลาขยาย (บางเครื่องอาจเจอ)
+   ============================================================ */
+.html5-video-player.ytp-fullscreen video {
+    object-fit: contain !important; /* บังคับสัดส่วน */
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+
+/* ============================================================
+   HIDE YOUTUBE LOADER (ซ่อนแถบแดงรกๆ)
+   ============================================================ */
+/* เรามี Transition สวยๆ แล้ว เอาแถบโหลดสีแดงเดิมออกไปเลย */
+yt-page-navigation-progress {
+    display: none !important;
+}
+
+/* ============================================================
+   GLASS POPUP MENUS (Settings, Captions, etc.)
+   ============================================================ */
+
+/* เลือกเมนู Popups ทั้งหมด */
+.ytp-delhi-modern .ytp-settings-menu .ytp-panel-menu,.ytp-panel-header,.ytp-panel-footer
+ {
+    background: rgba(20, 20, 20, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* เวลาเอาเมาส์ชี้ตัวเลือกในเมนู */
+.ytp-menuitem:hover,
+.ytp-menuitem[aria-checked="true"] .ytp-menuitem-label {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px;
+}
+
+/* ============================================================
+   MINI PLAYER FIX V2 (จัดปุ่มให้ตรงเป๊ะ)
+   ============================================================ */
+
+/* 1. จัดการปุ่มทั้งหมดใน Mini Player (Play, Next, Prev) */
+ytd-miniplayer .ytp-right-controls .ytp-button,
+ytd-miniplayer .ytp-left-controls .ytp-button,
+ytd-miniplayer .ytp-play-button,
+ytd-miniplayer .ytp-next-button,
+ytd-miniplayer .ytp-prev-button { /* เพิ่ม selector ให้ครบ */
+    
+    width: 50px !important; 
+    height: 50px !important;
+    min-width: 50px !important; /* กันมันหด */
+    
+    padding: 0 !important;
+    margin: 0 4px !important; /* ระยะห่างระหว่างปุ่ม */
+    border-radius: 50% !important;
+    
+    /* เทคนิคจัดกึ่งกลางขั้นเด็ดขาด (Flexbox) */
+    display: inline-flex !important; 
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important; /* ช่วยเรื่องบรรทัด */
+    
+    /* ล้างค่าเดิมของ YouTube ที่อาจดันปุ่มเพี้ยน */
+    top: auto !important;
+    left: auto !important;
+}
+
+/* 2. จัดการไอคอนข้างใน (SVG) */
+ytd-miniplayer .ytp-button svg {
+    width: 18px !important; /* ลดขนาดลงอีกนิดให้ดูคลีน */
+    height: 18px !important;
+    
+    /* ล้างค่า Transformation เดิมทิ้งให้หมด */
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    
+    /* เงาไอคอน */
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); 
+}
+
+/* 3. แก้เฉพาะปุ่ม Next/Prev ที่ชอบเบี้ยว */
+/* บางที YouTube ใส่ padding-top มาให้ปุ่มพวกนี้ เราต้องล้างออก */
+ytd-miniplayer .ytp-next-button svg,
+ytd-miniplayer .ytp-prev-button svg {
+    margin-top: 0 !important;
+    top: 0 !important;
+    position: relative !important;
+}
+
+/* 4. ย่อขนาดตัวเลขเวลา (Time) ไม่ให้ใหญ่คับจอ */
+ytd-miniplayer .ytp-time-display,
+ytd-miniplayer .ytp-time-current,
+ytd-miniplayer .ytp-time-separator,
+ytd-miniplayer .ytp-time-duration {
+    font-size: 11px !important; /* ลดขนาดฟอนต์ */
+    line-height: 32px !important; /* จัดให้อยู่กลางบรรทัดเดียวกับปุ่ม */
+    font-weight: 500 !important;
+    padding: 0 5px !important;
+}
+
+/* ============================================================
+   LIQUID JELLY TRANSITION (เด้งดึ๋งแบบมีชีวิต)
+   ============================================================ */
+
+/* 1. ม่านบังตา (Curtain) - สไตล์ LiquidTube */
+#liquid-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    
+    /* พื้นหลังสีน้ำเงินจางๆ + เบลอ */
+    background: var(--ss);
+    backdrop-filter: blur(0px);
+    transition: all 0.1s ease;
+}
+
+#liquid-curtain.active {
+    opacity: 1;
+    backdrop-filter: blur(90px) saturate(150%); /* เบลอวูบ */
+}
+
+/* ============================================================
+   2. JELLY PHYSICS (สูตรฟิสิกส์)
+   ============================================================ */
+
+/* ท่าเด้งดึ๋ง: ขึ้น -> เลยป้าย -> ย่อตัว -> คืนตัว */
+@keyframes jelly-bounce-up {
+    0% { 
+        opacity: 0; 
+        transform: translateY(50px) scale(0.9); /* เริ่มต่ำและหดตัว */
+    }
+    60% { 
+        opacity: 1; 
+        transform: translateY(-10px) scale(1.02); /* เด้งเลยขึ้นไปนิดนึง + ยืด */
+    }
+    80% { 
+        transform: translateY(5px) scale(0.98); /* ดีดกลับลงมา + หด */
+    }
+    100% { 
+        transform: translateY(0) scale(1); /* หยุดนิ่ง */
+    }
+}
+
+/* ท่าขยายตัว (สำหรับ Video Player): เล็ก -> ใหญ่บึ้ม -> คืนตัว */
+@keyframes jelly-zoom {
+    0% { opacity: 0; transform: scale(0.8); border-radius: 50px; }
+    60% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); border-radius: 12px; }
+}
+
+/* ============================================================
+   3. STAGGERED ANIMATION (จัดลำดับการเด้ง)
+   ============================================================ */
+
+/* สถานะเตรียมตัว (ซ่อนของไว้ก่อน) */
+body.jelly-ready #columns #primary-inner > #meta,       
+body.jelly-ready #columns #primary-inner > #info,       
+body.jelly-ready #columns #primary-inner > #comments,   
+body.jelly-ready #columns #secondary,
+body.jelly-ready #player-container-outer { /* ซ่อน Player ด้วยรอบนี้ */
+    opacity: 0;
+}
+
+/* สถานะเริ่มเด้ง! (Popping) */
+
+/* 1. Video Player (เด้งมาตัวแรก แบบขยายตัว) */
+body.jelly-popping #player-container-outer {
+    animation: jelly-zoom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 2. ชื่อคลิป (เด้งตามมา) */
+body.jelly-popping #columns #primary-inner > #meta {
+    animation: jelly-bounce-up 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+}
+
+/* 3. คำอธิบาย (ตามมาติดๆ) */
+body.jelly-popping #columns #primary-inner > #info {
+    animation: jelly-bounce-up 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+}
+
+/* 4. คลิปแนะนำด้านขวา (เด้งมาช้าหน่อย) */
+body.jelly-popping #columns #secondary {
+    animation: jelly-bounce-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+}
+
+/* 5. คอมเมนต์ (มาช้าสุด) */
+body.jelly-popping #columns #primary-inner > #comments {
+    animation: jelly-bounce-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards;
+}
+
+/* ============================================================
+   GLASS RIM LIGHT (แสงสะท้อนสันขอบแก้ว)
+   ============================================================ */
+
+/* รวม Selector ปุ่มทั้งหมด */
+.ytp-right-controls,
+.ytp-time-wrapper,
+.ytp-volume-area,
+.ytp-play-button,
+.ytp-fullscreen-quick-actions,
+.ytp-fullscreen-grid-expand-button,
+#actions button, 
+#search-icon-legacy {
+
+    /* 1. สร้างขอบใส (เพื่อให้เราวาดแสงลงไปในเนื้อขอบได้) */
+    border: 1.5px solid transparent !important;
+    border-radius: 50px !important;
+
+    /* 2. ซ้อน Layer พื้นหลัง 3 ชั้น (หัวใจสำคัญ!) */
+    background: 
+        /* [Layer 1: บนสุด] แสงฟุ้งที่ผิวหน้า (Surface Glow) - อันเดิมที่คุณมี */
+        /* padding-box = แสดงเฉพาะข้างใน ไม่ทับขอบ */
+        radial-gradient(
+            300px circle at var(--mouse-x) var(--mouse-y), 
+            rgba(255, 255, 255, 0.15), 
+            transparent 60%
+        ) padding-box, 
+
+        /* [Layer 2: กลาง] สีเนื้อกระจก (Tint) */
+        /* padding-box = แสดงเฉพาะข้างใน */
+        linear-gradient(
+            rgba(20, 20, 20, 0.4), 
+            rgba(20, 20, 20, 0.4)
+        ) padding-box,
+
+        /* [Layer 3: ล่างสุด] แสงขาววาบที่ขอบ (Rim Light) - อันนี้คือตัวใหม่! */
+        /* border-box = กินพื้นที่ไปถึงขอบ */
+        /* ใช้สีขาวจัดๆ (Opacity 1) เพื่อให้เหมือนแสงสะท้อนโลหะ/แก้ว */
+        radial-gradient(
+            120px circle at var(--mouse-x) var(--mouse-y), 
+            rgba(255, 255, 255, 1) 0%,   /* ขาวจั๊วะตรงจุดโฟกัส */
+            rgba(255, 255, 255, 0.5) 20%, /* ไล่เฟด */
+            transparent 50%
+        ) border-box !important;
+
+    /* 3. สั่งตัดขอบแต่ละชั้นให้แยกกัน */
+    /* ลำดับต้องตรงกับ background ด้านบน: padding, padding, border */
+    background-clip: padding-box, padding-box, border-box !important;
+
+    /* Effect อื่นๆ */
+    backdrop-filter: blur(10px) saturate(180%) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+    /* Animation */
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.yt-spec-button-shape-next--size-m.yt-spec-button-shape-next--segmented-start::after
+ {
+    width: 0px !important;
+}
+.ytDislikeButtonViewModelHost
+ {
+    padding-left: 10px !important;
+}
+ytd-watch-metadata[flex-menu-enabled] #actions.ytd-watch-metadata ytd-menu-renderer.ytd-watch-metadata {
+    justify-content: flex-end;
+    padding: 0 0 40px 0;
+}
+.ytwReelActionBarViewModelHost
+ {
+    display: flex;
+    flex-direction: column;
+    align-content: stretch;
+    justify-content: center;
+    align-items: flex-end;
+}
