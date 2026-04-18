@@ -1,1 +1,13 @@
 
+{
+  "themes": [
+    {
+      "name": "Youtube Midnight Theme by saeedkohansal",
+      "css_url": "https://raw.githubusercontent.com/mich111discord/updaterapps/refs/heads/main/EasyTube/themes/Youtube-Midnight-theme.css"
+    },
+    {
+      "name": "Pink Mode",
+      "css_url": "https://raw.githubusercontent.com/mich111discord/updaterapps/refs/heads/main/EasyTube/themes/pink.css"
+    }
+  ]
+}
