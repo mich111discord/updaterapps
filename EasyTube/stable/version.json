@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
+  "version": "1.7.7",
   "url": "",
   "sha256": "",
-  "changelog": "Naprawiono blokowanie reklam wideo i błędy systemu aktualizacji."
+  "changelog": "Naprawiono blokowanie reklam wideo i zoptymalizowano renderowanie filmów. Zostały wprowadzone motywy pozwalajśce nna urozmaicenie EasyTube."
 }
