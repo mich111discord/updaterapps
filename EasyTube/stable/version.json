@@ -1,6 +1,6 @@
 {
-  "version": "1.7.8",
-  "url": "https://github.com/mich111discord/updaterapps/releases/download/1.7.8EasyTube/EasyTubeupdate23052026.exe",
-  "sha256": "3623dec34a6920145dc9f6617a9ba576b7e0d03b17fbeae7b335dc60ee8b18a0",
-  "changelog": "Naprawiono blokowanie reklam wideo i zoptymalizowano renderowanie filmów. Dodano pobieranie playlist bezpośrednio w EasyTube Poprawiono wydajność na Windows 10."
+  "version": "1.7.9",
+  "url": "https://github.com/mich111discord/updaterapps/releases/download/1.7.9EasyTube/EasyTubeupdate24052026.exe",
+  "sha256": "51e63515da28a15950c62c930ebbaa2e4bad0b40d6157699f82bb4a233563af3",
+  "changelog": "Naprawiono blokowanie reklam wideo i zoptymalizowano renderowanie filmów. Dodano pobieranie playlist bezpośrednio w EasyTube Poprawiono wydajność na Windows 10. Poprawiono logowanie do konta Google."
 }
