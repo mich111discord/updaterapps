@@ -11,4 +11,4 @@ Huawei=huawei.com
 Realme=realme.com
 Oppo=oppo.com
 Oneplus=oneplus.com
-
+Lark=intel.com
