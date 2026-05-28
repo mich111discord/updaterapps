@@ -1,0 +1,14 @@
+Samsung=samsung.com
+Xiaomi=mi.com
+Google=google.com
+OnePlus=oneplus.com
+Motorola=motorola.com
+Nothing=nothing.tech
+Lenovo=lenovo.com
+Motorola=motorola.com
+MediaTek=mediatek.com
+Huawei=huawei.com
+Realme=realme.com
+Oppo=oppo.com
+Oneplus=oneplus.com
+
