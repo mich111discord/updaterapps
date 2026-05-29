@@ -1,4 +1,4 @@
-Samsung=samsung.com
+
 Xiaomi=mi.com
 Google=google.com
 OnePlus=oneplus.com
