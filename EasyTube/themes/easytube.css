@@ -12,7 +12,8 @@
     --et-yellow-light: #ffe54c;
     --et-bg-dark: #0a1a0a;
     --et-bg-card: #0d240d;
-    --et-text: #e8f5e9;
+    --et-text-white: #ffffff;
+    --et-text-dark: #0a1a0a;
 }
 
 /* === TŁO STRONY === */
@@ -21,93 +22,131 @@ ytd-app {
     background: linear-gradient(145deg, #0a1a0a 0%, #0d240d 40%, #1a2a0a 100%);
 }
 
-/* === PASEK GÓRNY (Masthead) === */
+/* === PASEK GÓRNY === */
 ytd-masthead {
     background: linear-gradient(90deg, #0d240d 0%, #1a3a0a 50%, #0d240d 100%);
-    border-bottom: 2px solid var(--et-green);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--et-green), var(--et-yellow), var(--et-green)) 1;
 }
 
-/* Logo z gradientem */
-#logo-icon {
-    fill: url(#et-gradient);
+/* === LOGO EASYTUBE === */
+#logo-icon,
+#logo-icon-container,
+ytd-logo-renderer,
+#youtube-red-path,
+#youtube-paths {
+    display: none !important;
 }
 
-#logo-icon g {
-    fill: url(#et-gradient);
+ytd-topbar-logo-renderer::before {
+    content: "EasyTube";
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--et-green) 0%, var(--et-yellow) 50%, var(--et-green) 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: et-gradient-shift 3s ease-in-out infinite;
+    padding: 0 4px;
 }
 
-/* === PRZYCISKI I ELEMENTY INTERAKTYWNE === */
-/* Przycisk Subskrybuj */
-ytd-subscribe-button-renderer[subscribed] .ytd-subscribe-button-renderer {
-    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
-    color: #000 !important;
+ytd-topbar-logo-renderer::after {
+    content: "▶";
+    font-size: 20px;
+    margin-right: 6px;
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: et-gradient-shift 3s ease-in-out infinite;
 }
 
-ytd-subscribe-button-renderer:not([subscribed]) .ytd-subscribe-button-renderer {
-    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
-    color: #000 !important;
+@keyframes et-gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-/* Przycisk LIKE */
-ytd-toggle-button-renderer[style*="--yt-spec-icon-inactive"] {
-    color: var(--et-yellow) !important;
-}
+/* ====================================================
+   GRADIENTY
+   ==================================================== */
 
+/* PRZYCISK LIKE */
 #like-button ytd-toggle-button-renderer {
-    color: var(--et-yellow) !important;
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border: none !important;
+    border-radius: 18px !important;
+    padding: 6px 16px !important;
+    color: #0a1a0a !important;
+    font-weight: bold !important;
+}
+
+#like-button ytd-toggle-button-renderer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 214, 0, 0.4);
 }
 
 #dislike-button ytd-toggle-button-renderer {
-    color: var(--et-green) !important;
+    background: linear-gradient(135deg, var(--et-yellow), var(--et-green)) !important;
+    border: none !important;
+    border-radius: 18px !important;
+    padding: 6px 16px !important;
+    color: #0a1a0a !important;
 }
 
-/* === KARTY FILMÓW === */
-ytd-rich-item-renderer,
-ytd-video-renderer,
-ytd-compact-video-renderer {
-    background: linear-gradient(145deg, #0d240d, #0d2a0d) !important;
-    border: 1px solid rgba(0, 200, 83, 0.2);
-    border-radius: 12px !important;
-    transition: all 0.3s ease;
+/* PRZYCISK SUBSKRYBUJ */
+ytd-subscribe-button-renderer {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border-radius: 20px !important;
 }
 
-ytd-rich-item-renderer:hover,
-ytd-video-renderer:hover {
-    border-color: var(--et-green);
-    box-shadow: 0 0 20px rgba(0, 200, 83, 0.2);
+ytd-subscribe-button-renderer yt-formatted-string {
+    color: #0a1a0a !important;
+    font-weight: bold !important;
 }
 
-/* === TYTUŁY I NAPISY === */
-yt-formatted-string[class*="title"] {
-    color: var(--et-text) !important;
+/* PRZYCISK ZALOGUJ */
+ytd-button-renderer[button-next] {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border-radius: 20px !important;
 }
 
-#video-title {
-    color: #e8f5e9 !important;
+ytd-button-renderer[button-next] yt-formatted-string {
+    color: #0a1a0a !important;
+    font-weight: bold !important;
 }
 
-#video-title:hover {
-    color: var(--et-yellow) !important;
+/* PRZYCISK SZUKANIA */
+#search-icon-legacy {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border-radius: 0 20px 20px 0 !important;
 }
 
-ytd-channel-name a {
-    color: #a5d6a7 !important;
+#search-icon-legacy yt-icon {
+    color: #0a1a0a !important;
 }
 
-ytd-channel-name a:hover {
-    color: var(--et-yellow) !important;
+#search-icon-legacy:hover {
+    background: linear-gradient(135deg, var(--et-green-dark), var(--et-yellow-dark)) !important;
 }
 
-/* === WIDOK FILMU (Player) === */
-#movie_player {
-    background: #0a1a0a !important;
+/* NAGRÓWKI (CHIPS) */
+yt-chip-cloud-chip-renderer {
+    background: linear-gradient(135deg, rgba(0, 200, 83, 0.15), rgba(255, 214, 0, 0.15)) !important;
+    border: 1px solid var(--et-green) !important;
+    color: #ffffff !important;
 }
 
-/* Pasek postępu */
-.ytp-progress-bar {
-    background: rgba(255, 255, 255, 0.2) !important;
+yt-chip-cloud-chip-renderer[selected] {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    color: #0a1a0a !important;
+    border-color: var(--et-yellow) !important;
 }
 
+/* SUWAK POSTĘPU */
 .ytp-progress-bar .ytp-play-progress {
     background: linear-gradient(90deg, var(--et-green), var(--et-yellow)) !important;
 }
@@ -116,142 +155,7 @@ ytd-channel-name a:hover {
     background: var(--et-yellow) !important;
 }
 
-/* Przycisk odtwarzania */
-.ytp-button.ytp-play-button {
-    color: var(--et-green) !important;
-}
-
-.ytp-button.ytp-play-button:hover {
-    color: var(--et-yellow) !important;
-}
-
-/* === KOMENTARZE === */
-ytd-comment-renderer {
-    background: rgba(13, 36, 13, 0.5) !important;
-    border-left: 3px solid rgba(0, 200, 83, 0.3);
-    padding: 8px 12px !important;
-    margin: 4px 0 !important;
-    border-radius: 0 8px 8px 0 !important;
-}
-
-ytd-comment-renderer:hover {
-    border-left-color: var(--et-yellow);
-}
-
-#author-text {
-    color: var(--et-yellow) !important;
-}
-
-#content-text {
-    color: #c8e6c9 !important;
-}
-
-/* === PANEL BOCZNY (Guide) === */
-ytd-guide-renderer {
-    background: #0a1a0a !important;
-    border-right: 1px solid rgba(0, 200, 83, 0.2);
-}
-
-ytd-guide-entry-renderer[active] {
-    background: linear-gradient(90deg, rgba(0, 200, 83, 0.2), transparent) !important;
-    border-left: 3px solid var(--et-green);
-}
-
-ytd-guide-entry-renderer:hover {
-    background: rgba(0, 200, 83, 0.1) !important;
-}
-
-/* === POLA WYSZUKIWANIA === */
-#search-input {
-    background: #0d240d !important;
-    border: 1px solid var(--et-green) !important;
-    border-radius: 20px !important;
-    color: #e8f5e9 !important;
-}
-
-#search-input:focus {
-    border-color: var(--et-yellow) !important;
-    box-shadow: 0 0 15px rgba(0, 200, 83, 0.3);
-}
-
-/* Przycisk szukania */
-#search-icon-legacy {
-    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
-    border-radius: 0 20px 20px 0 !important;
-}
-
-#search-icon-legacy yt-icon {
-    color: #000 !important;
-}
-
-/* === BOCZNE ZAKŁADKI (Tabs) === */
-yt-tab-shape {
-    color: #a5d6a7 !important;
-}
-
-yt-tab-shape[selected] {
-    color: var(--et-yellow) !important;
-}
-
-/* === MINIATURY (Thumbnails) === */
-ytd-thumbnail {
-    border-radius: 8px !important;
-    overflow: hidden !important;
-}
-
-/* Ramka wokół miniatur */
-ytd-thumbnail img {
-    border: 1px solid rgba(0, 200, 83, 0.2);
-    border-radius: 8px !important;
-}
-
-/* === LINKI === */
-a {
-    color: var(--et-green) !important;
-}
-
-a:hover {
-    color: var(--et-yellow) !important;
-}
-
-/* === STOPKA (Footer) === */
-ytd-footer-renderer {
-    background: #0a1a0a !important;
-    border-top: 1px solid rgba(0, 200, 83, 0.2);
-}
-
-ytd-footer-renderer a {
-    color: #4caf50 !important;
-}
-
-ytd-footer-renderer a:hover {
-    color: var(--et-yellow) !important;
-}
-
-/* === CZAS ODTWARZANIA === */
-ytd-thumbnail-overlay-time-status-renderer {
-    background: rgba(0, 0, 0, 0.7) !important;
-    color: var(--et-yellow) !important;
-}
-
-/* === GRADIENT DEFINICJA DLA SVG === */
-svg #et-gradient {
-    stop-color: #00c853;
-}
-
-svg #et-gradient-stop2 {
-    stop-color: #ffd600;
-}
-
-/* === SKROL BAR === */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #0a1a0a;
-}
-
+/* SKROL BAR */
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, var(--et-green), var(--et-yellow));
     border-radius: 4px;
@@ -261,59 +165,242 @@ svg #et-gradient-stop2 {
     background: var(--et-yellow);
 }
 
-/* === SELECT / ZAZNACZENIE === */
-::selection {
-    background: var(--et-green);
-    color: #000;
+/* MENU PROFILOWE */
+ytd-multi-page-menu-renderer,
+ytd-menu-popup-renderer,
+ytd-account-menu-renderer {
+    background: linear-gradient(145deg, #0d240d, #1a3a0a) !important;
+    border: 2px solid transparent !important;
+    border-image: linear-gradient(135deg, var(--et-green), var(--et-yellow)) 1 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 40px rgba(0, 200, 83, 0.3) !important;
 }
 
-/* === NAGRÓWKI (Chips) === */
-yt-chip-cloud-chip-renderer {
-    background: rgba(0, 200, 83, 0.15) !important;
-    border: 1px solid rgba(0, 200, 83, 0.3) !important;
-    color: #e8f5e9 !important;
-}
-
-yt-chip-cloud-chip-renderer[selected] {
+ytd-account-header-renderer,
+#header {
     background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
-    color: #000 !important;
-    border-color: var(--et-yellow) !important;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 16px !important;
 }
 
-/* === EFEKTY ANIMACJI === */
-ytd-rich-item-renderer {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+ytd-menu-service-item-renderer:hover {
+    background: linear-gradient(135deg, rgba(0, 200, 83, 0.2), rgba(255, 214, 0, 0.2)) !important;
+    transform: translateX(4px);
+}
+
+ytd-menu-service-item-renderer:active {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    transform: scale(0.97);
+}
+
+ytd-guide-entry-renderer[active] {
+    background: linear-gradient(90deg, rgba(0, 200, 83, 0.2), transparent) !important;
+    border-left: 3px solid var(--et-green);
+}
+
+/* KARTY FILMÓW */
+ytd-rich-item-renderer,
+ytd-video-renderer,
+ytd-compact-video-renderer {
+    background: linear-gradient(145deg, #0d240d, #0d2a0d) !important;
+    border: 1px solid transparent !important;
+    border-image: linear-gradient(135deg, rgba(0, 200, 83, 0.2), rgba(255, 214, 0, 0.2)) 1 !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
 }
 
 ytd-rich-item-renderer:hover {
+    border-image: linear-gradient(135deg, var(--et-green), var(--et-yellow)) 1 !important;
+    box-shadow: 0 0 30px rgba(0, 200, 83, 0.15);
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 200, 83, 0.25);
 }
 
-/* === KOLOROWANIE IKON === */
+/* ====================================================
+   TEKST - CIEMNOZIELONY LUB BIAŁY
+   ==================================================== */
+
+/* TEKST NA JASNYM TLE - CIEMNOZIELONY */
+ytd-account-header-renderer #email,
+ytd-account-header-renderer #account-name,
+ytd-account-header-renderer #channel-name,
+ytd-account-header-renderer #channel-link,
+#channel-link,
+ytd-button-renderer[button-next] yt-formatted-string,
+ytd-subscribe-button-renderer yt-formatted-string,
+#like-button ytd-toggle-button-renderer {
+    color: #0a1a0a !important;
+    font-weight: bold !important;
+}
+
+/* TEKST NA CIEMNYM TLE - BIAŁY */
+yt-formatted-string,
+#video-title,
+#text,
+#title,
+#owner-name a,
+#description-text,
+#info-text,
+ytd-guide-entry-renderer yt-formatted-string,
+ytd-menu-service-item-renderer yt-formatted-string,
+ytd-simple-menu-renderer yt-formatted-string,
+ytd-rich-item-renderer #video-title,
+ytd-video-renderer #video-title,
+ytd-compact-video-renderer #video-title,
+yt-chip-cloud-chip-renderer {
+    color: #ffffff !important;
+}
+
+/* ====================================================
+   KOMENTARZE - NAZWY I CZAS BIAŁE
+   ==================================================== */
+
+/* Nazwa autora komentarza - BIAŁA */
+ytd-comment-renderer #author-text,
+ytd-comment-renderer .ytd-comment-renderer #author-text,
+ytd-comment-renderer a#author-text,
+#author-text {
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* Czas komentarza - BIAŁY */
+ytd-comment-renderer #published-time,
+ytd-comment-renderer .ytd-comment-renderer #published-time,
+ytd-comment-renderer #published-time a,
+ytd-comment-renderer .ytd-expander #published-time,
+ytd-comment-renderer .ytd-comment-renderer #published-time-text,
+#published-time,
+#published-time-text {
+    color: #a5d6a7 !important;
+}
+
+/* Treść komentarza - BIAŁA */
+ytd-comment-renderer #content-text,
+ytd-comment-renderer .ytd-comment-renderer #content-text,
+ytd-comment-renderer #comment-content,
+ytd-comment-renderer .ytd-expander #content-text {
+    color: #e8f5e9 !important;
+}
+
+/* Tło komentarza */
+ytd-comment-renderer,
+ytd-comment-thread-renderer {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-left: 3px solid transparent !important;
+    border-image: linear-gradient(180deg, var(--et-green), var(--et-yellow)) 1 !important;
+    border-radius: 0 8px 8px 0 !important;
+    padding: 8px 12px !important;
+    margin: 4px 0 !important;
+}
+
+ytd-comment-renderer:hover {
+    border-image: linear-gradient(180deg, var(--et-yellow), var(--et-green)) 1 !important;
+}
+
+/* Przycisk "Pokaż odpowiedzi" */
+ytd-comment-renderer #show-replies,
+ytd-comment-renderer .ytd-comment-renderer #show-replies {
+    color: var(--et-green) !important;
+}
+
+ytd-comment-renderer #show-replies:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* Polubienia komentarzy */
+ytd-comment-renderer #vote-count,
+ytd-comment-renderer .ytd-comment-renderer #vote-count {
+    color: #a5d6a7 !important;
+}
+
+/* ====================================================
+   POZOSTAŁE ELEMENTY
+   ==================================================== */
+
+/* WYSZUKIWARKA */
+#search-input {
+    background: #ffffff !important;
+    border: 2px solid var(--et-green) !important;
+    border-radius: 20px !important;
+    color: #000000 !important;
+    padding: 8px 16px !important;
+}
+
+#search-input:focus {
+    border-color: var(--et-yellow) !important;
+    box-shadow: 0 0 20px rgba(255, 214, 0, 0.3) !important;
+}
+
+#search-input::placeholder {
+    color: #888888 !important;
+}
+
+/* IKONY */
 yt-icon {
     color: #a5d6a7 !important;
+    transition: all 0.3s ease;
 }
 
 yt-icon:hover {
     color: var(--et-yellow) !important;
+    filter: drop-shadow(0 0 8px rgba(255, 214, 0, 0.3));
 }
 
-/* === PRZYCISK LOGOWANIA === */
-ytd-button-renderer[button-next] {
-    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
-    border-radius: 20px !important;
+/* LINKI */
+a {
+    color: var(--et-green) !important;
+    transition: all 0.3s ease;
 }
 
-ytd-button-renderer[button-next] yt-formatted-string {
-    color: #000 !important;
-    font-weight: bold !important;
+a:hover {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-/* === DEFINICJA GRADIENTU DLA SVG === */
-<defs>
-    <linearGradient id="et-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#00c853;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#ffd600;stop-opacity:1" />
-    </linearGradient>
-</defs>
+/* PANEL BOCZNY */
+ytd-guide-renderer {
+    background: #0a1a0a !important;
+    border-right: 1px solid rgba(0, 200, 83, 0.2);
+}
+
+/* STOPKA */
+ytd-footer-renderer {
+    background: #0a1a0a !important;
+    border-top: 1px solid rgba(0, 200, 83, 0.2);
+}
+
+ytd-footer-renderer a {
+    color: #a5d6a7 !important;
+}
+
+ytd-footer-renderer a:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* ZDJĘCIE PROFILOWE - BEZ RAMKI */
+ytd-account-header-renderer #avatar,
+#avatar-container,
+#avatar-container img,
+yt-img-shadow #avatar,
+#avatar-btn,
+#avatar-btn img {
+    border: none !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+#avatar-btn:hover {
+    border: none !important;
+    box-shadow: 0 0 25px rgba(255, 214, 0, 0.3) !important;
+    transform: scale(1.05);
+    transition: all 0.3s ease !important;
+}
+
+/* SELEKTORY */
+::selection {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow));
+    color: #0a1a0a;
+}
