@@ -1,0 +1,319 @@
+/* ====================================================
+   MOTYW EASYTUBE - GREEN TO YELLOW GRADIENT
+   ==================================================== */
+
+/* === PODSTAWOWE KOLORY === */
+:root {
+    --et-green: #00c853;
+    --et-green-dark: #009624;
+    --et-green-light: #69f0ae;
+    --et-yellow: #ffd600;
+    --et-yellow-dark: #c7a600;
+    --et-yellow-light: #ffe54c;
+    --et-bg-dark: #0a1a0a;
+    --et-bg-card: #0d240d;
+    --et-text: #e8f5e9;
+}
+
+/* === TŁO STRONY === */
+body,
+ytd-app {
+    background: linear-gradient(145deg, #0a1a0a 0%, #0d240d 40%, #1a2a0a 100%);
+}
+
+/* === PASEK GÓRNY (Masthead) === */
+ytd-masthead {
+    background: linear-gradient(90deg, #0d240d 0%, #1a3a0a 50%, #0d240d 100%);
+    border-bottom: 2px solid var(--et-green);
+}
+
+/* Logo z gradientem */
+#logo-icon {
+    fill: url(#et-gradient);
+}
+
+#logo-icon g {
+    fill: url(#et-gradient);
+}
+
+/* === PRZYCISKI I ELEMENTY INTERAKTYWNE === */
+/* Przycisk Subskrybuj */
+ytd-subscribe-button-renderer[subscribed] .ytd-subscribe-button-renderer {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    color: #000 !important;
+}
+
+ytd-subscribe-button-renderer:not([subscribed]) .ytd-subscribe-button-renderer {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    color: #000 !important;
+}
+
+/* Przycisk LIKE */
+ytd-toggle-button-renderer[style*="--yt-spec-icon-inactive"] {
+    color: var(--et-yellow) !important;
+}
+
+#like-button ytd-toggle-button-renderer {
+    color: var(--et-yellow) !important;
+}
+
+#dislike-button ytd-toggle-button-renderer {
+    color: var(--et-green) !important;
+}
+
+/* === KARTY FILMÓW === */
+ytd-rich-item-renderer,
+ytd-video-renderer,
+ytd-compact-video-renderer {
+    background: linear-gradient(145deg, #0d240d, #0d2a0d) !important;
+    border: 1px solid rgba(0, 200, 83, 0.2);
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+ytd-rich-item-renderer:hover,
+ytd-video-renderer:hover {
+    border-color: var(--et-green);
+    box-shadow: 0 0 20px rgba(0, 200, 83, 0.2);
+}
+
+/* === TYTUŁY I NAPISY === */
+yt-formatted-string[class*="title"] {
+    color: var(--et-text) !important;
+}
+
+#video-title {
+    color: #e8f5e9 !important;
+}
+
+#video-title:hover {
+    color: var(--et-yellow) !important;
+}
+
+ytd-channel-name a {
+    color: #a5d6a7 !important;
+}
+
+ytd-channel-name a:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* === WIDOK FILMU (Player) === */
+#movie_player {
+    background: #0a1a0a !important;
+}
+
+/* Pasek postępu */
+.ytp-progress-bar {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.ytp-progress-bar .ytp-play-progress {
+    background: linear-gradient(90deg, var(--et-green), var(--et-yellow)) !important;
+}
+
+.ytp-progress-bar .ytp-scrubber-button {
+    background: var(--et-yellow) !important;
+}
+
+/* Przycisk odtwarzania */
+.ytp-button.ytp-play-button {
+    color: var(--et-green) !important;
+}
+
+.ytp-button.ytp-play-button:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* === KOMENTARZE === */
+ytd-comment-renderer {
+    background: rgba(13, 36, 13, 0.5) !important;
+    border-left: 3px solid rgba(0, 200, 83, 0.3);
+    padding: 8px 12px !important;
+    margin: 4px 0 !important;
+    border-radius: 0 8px 8px 0 !important;
+}
+
+ytd-comment-renderer:hover {
+    border-left-color: var(--et-yellow);
+}
+
+#author-text {
+    color: var(--et-yellow) !important;
+}
+
+#content-text {
+    color: #c8e6c9 !important;
+}
+
+/* === PANEL BOCZNY (Guide) === */
+ytd-guide-renderer {
+    background: #0a1a0a !important;
+    border-right: 1px solid rgba(0, 200, 83, 0.2);
+}
+
+ytd-guide-entry-renderer[active] {
+    background: linear-gradient(90deg, rgba(0, 200, 83, 0.2), transparent) !important;
+    border-left: 3px solid var(--et-green);
+}
+
+ytd-guide-entry-renderer:hover {
+    background: rgba(0, 200, 83, 0.1) !important;
+}
+
+/* === POLA WYSZUKIWANIA === */
+#search-input {
+    background: #0d240d !important;
+    border: 1px solid var(--et-green) !important;
+    border-radius: 20px !important;
+    color: #e8f5e9 !important;
+}
+
+#search-input:focus {
+    border-color: var(--et-yellow) !important;
+    box-shadow: 0 0 15px rgba(0, 200, 83, 0.3);
+}
+
+/* Przycisk szukania */
+#search-icon-legacy {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border-radius: 0 20px 20px 0 !important;
+}
+
+#search-icon-legacy yt-icon {
+    color: #000 !important;
+}
+
+/* === BOCZNE ZAKŁADKI (Tabs) === */
+yt-tab-shape {
+    color: #a5d6a7 !important;
+}
+
+yt-tab-shape[selected] {
+    color: var(--et-yellow) !important;
+}
+
+/* === MINIATURY (Thumbnails) === */
+ytd-thumbnail {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+/* Ramka wokół miniatur */
+ytd-thumbnail img {
+    border: 1px solid rgba(0, 200, 83, 0.2);
+    border-radius: 8px !important;
+}
+
+/* === LINKI === */
+a {
+    color: var(--et-green) !important;
+}
+
+a:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* === STOPKA (Footer) === */
+ytd-footer-renderer {
+    background: #0a1a0a !important;
+    border-top: 1px solid rgba(0, 200, 83, 0.2);
+}
+
+ytd-footer-renderer a {
+    color: #4caf50 !important;
+}
+
+ytd-footer-renderer a:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* === CZAS ODTWARZANIA === */
+ytd-thumbnail-overlay-time-status-renderer {
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: var(--et-yellow) !important;
+}
+
+/* === GRADIENT DEFINICJA DLA SVG === */
+svg #et-gradient {
+    stop-color: #00c853;
+}
+
+svg #et-gradient-stop2 {
+    stop-color: #ffd600;
+}
+
+/* === SKROL BAR === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a1a0a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--et-green), var(--et-yellow));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--et-yellow);
+}
+
+/* === SELECT / ZAZNACZENIE === */
+::selection {
+    background: var(--et-green);
+    color: #000;
+}
+
+/* === NAGRÓWKI (Chips) === */
+yt-chip-cloud-chip-renderer {
+    background: rgba(0, 200, 83, 0.15) !important;
+    border: 1px solid rgba(0, 200, 83, 0.3) !important;
+    color: #e8f5e9 !important;
+}
+
+yt-chip-cloud-chip-renderer[selected] {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    color: #000 !important;
+    border-color: var(--et-yellow) !important;
+}
+
+/* === EFEKTY ANIMACJI === */
+ytd-rich-item-renderer {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+ytd-rich-item-renderer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 200, 83, 0.25);
+}
+
+/* === KOLOROWANIE IKON === */
+yt-icon {
+    color: #a5d6a7 !important;
+}
+
+yt-icon:hover {
+    color: var(--et-yellow) !important;
+}
+
+/* === PRZYCISK LOGOWANIA === */
+ytd-button-renderer[button-next] {
+    background: linear-gradient(135deg, var(--et-green), var(--et-yellow)) !important;
+    border-radius: 20px !important;
+}
+
+ytd-button-renderer[button-next] yt-formatted-string {
+    color: #000 !important;
+    font-weight: bold !important;
+}
+
+/* === DEFINICJA GRADIENTU DLA SVG === */
+<defs>
+    <linearGradient id="et-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#00c853;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#ffd600;stop-opacity:1" />
+    </linearGradient>
+</defs>
