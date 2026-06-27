@@ -1,114 +1,86 @@
 // =====================================================
-// EasyTube AdBlock - AdGuard + Banery + Live Fix
+// EasyTube AdBlock - ZABEZPIECZONA WERSJA
 // =====================================================
 
+// GŁÓWNA FUNKCJA - OPAKOWANA W TRY/CATCH
 (function() {
-    // Sprawdź czy blokowanie reklam jest włączone
-    const adblockEnabled = window.__easytube_adblock_enabled !== false;
+    'use strict';
     
-    if (!adblockEnabled) {
-        // Jeśli wyłączone, usuń wszystkie elementy blokujące
-        const elements = document.querySelectorAll('#block-youtube-ads-logo, #block-youtube-ads-style, #easytube-extra-adblock, #easytube-live-fix, #easytube-sponsored-blocks, #easytube-login-fix');
-        elements.forEach(el => el.remove());
-        return;
+    // Funkcja do bezpiecznego sprawdzania czy dokument jest gotowy
+    function isDocumentReady() {
+        return document && document.documentElement && document.head && document.body;
     }
     
-    // =====================================================
-    // POMOCNICZA FUNKCJA DO BEZPIECZNEGO DODAWANIA STYLI
-    // =====================================================
-    const safeAppendStyle = (id, css) => {
+    // Funkcja do bezpiecznego dodawania stylów
+    function safeAddStyle(id, css) {
         try {
-            if (!document || !document.head) {
-                // Jeśli head nie istnieje, spróbuj ponownie za chwilę
-                setTimeout(() => safeAppendStyle(id, css), 50);
-                return;
-            }
-            if (document.getElementById(id)) {
-                return;
-            }
+            if (!document || !document.head) return false;
+            if (document.getElementById(id)) return true;
             const style = document.createElement('style');
             style.id = id;
             style.textContent = css;
             document.head.appendChild(style);
+            return true;
         } catch(e) {
-            // Ignoruj błędy
+            return false;
         }
-    };
+    }
+    
+    // Funkcja do bezpiecznego usuwania elementów
+    function safeRemoveElements(selector) {
+        try {
+            if (!document) return;
+            document.querySelectorAll(selector).forEach(el => {
+                if (el && el.parentNode) {
+                    try { el.remove(); } catch(e) {}
+                }
+            });
+        } catch(e) {}
+    }
     
     // =====================================================
-    // 1. NAPRAWA DLA TRANSMISJI NA ŻYWO (LIVE)
+    // 1. NAPRAWA LIVE - USUŃ KOMUNIKATY O BŁĘDACH
     // =====================================================
-    const fixLiveStream = () => {
+    function fixLiveStream() {
         try {
-            // Usuń WSZYSTKIE elementy związane z błędami
-            const removeSelectors = [
+            if (!document) return;
+            
+            // Usuń elementy błędów
+            const selectors = [
                 '.ytp-unsupported-browser-overlay',
-                '.ytp-unsupported-browser',
+                '.ytp-unsupported-browser', 
                 '.ytp-error-message',
                 '.ytp-error-content',
                 '.ytp-error',
                 '.ytp-error-screen',
-                '.ytp-error .ytp-error-content',
-                '.ytp-error .ytp-error-text',
-                '.ytp-error .ytp-error-message',
                 '.ytp-error-overlay',
                 '.ytp-error-overlay-container',
                 '.ytp-error-overlay-content',
                 '.ytp-playback-error',
-                '.ytp-playback-error-message',
-                '.ytp-playback-error-content',
-                '[class*="unsupported"]:not(.ytp-chrome-controls)',
-                '[class*="error-screen"]:not(.ytp-chrome-controls)',
-                '[class*="error-message"]:not(.ytp-chrome-controls)'
+                '[class*="unsupported"]',
+                '[class*="error-screen"]'
             ];
             
-            removeSelectors.forEach(selector => {
+            selectors.forEach(selector => {
                 try {
                     document.querySelectorAll(selector).forEach(el => {
-                        if (el && el.parentNode) {
+                        if (el && el.style) {
                             el.style.display = 'none';
                             el.style.visibility = 'hidden';
                             el.style.opacity = '0';
                             el.style.height = '0';
-                            el.style.minHeight = '0';
-                            el.style.maxHeight = '0';
                             el.style.overflow = 'hidden';
                             el.style.pointerEvents = 'none';
-                            try { el.remove(); } catch(e) {}
+                            if (el.parentNode) {
+                                try { el.remove(); } catch(e) {}
+                            }
                         }
                     });
                 } catch(e) {}
             });
             
-            // Usuń elementy z tekstem o błędzie
-            try {
-                document.querySelectorAll('*').forEach(el => {
-                    if (el && el.textContent && (
-                        el.textContent.includes('Nie możesz odtworzyć') ||
-                        el.textContent.includes('Cannot play') ||
-                        el.textContent.includes('browser') ||
-                        el.textContent.includes('unsupported') ||
-                        el.textContent.includes('not supported') ||
-                        el.textContent.includes('w swojej przeglądarce') ||
-                        el.textContent.includes('przeglądarka nie jest obsługiwana') ||
-                        el.textContent.includes('This browser is not supported')
-                    )) {
-                        if (!el.closest('.ytp-chrome-controls') && 
-                            !el.closest('.ytp-progress-bar') &&
-                            !el.closest('.ytp-volume-panel') &&
-                            !el.closest('.ytp-fullscreen-button')) {
-                            el.style.display = 'none';
-                            el.style.visibility = 'hidden';
-                            el.style.opacity = '0';
-                            el.style.height = '0';
-                            try { el.remove(); } catch(e) {}
-                        }
-                    }
-                });
-            } catch(e) {}
-            
-            // Dodaj styl dla live
-            safeAppendStyle('easytube-live-fix', `
+            // Dodaj styl tylko raz
+            safeAddStyle('easytube-live-fix', `
                 .ytp-unsupported-browser-overlay,
                 .ytp-unsupported-browser,
                 .ytp-error-message,
@@ -134,7 +106,6 @@
                     top: -9999px !important;
                     left: -9999px !important;
                     width: 0 !important;
-                    max-width: 0 !important;
                     padding: 0 !important;
                     margin: 0 !important;
                     border: 0 !important;
@@ -158,259 +129,126 @@
                     opacity: 1 !important;
                     background: #000 !important;
                 }
-                .ytp-error-content-renderer {
-                    display: none !important;
-                    opacity: 0 !important;
-                    visibility: hidden !important;
-                }
             `);
             
             // Spróbuj odtworzyć wideo
             try {
                 const video = document.querySelector('video');
-                if (video) {
-                    video.removeAttribute('disablepictureinpicture');
-                    video.removeAttribute('disableremoteplayback');
-                    if (video.paused && video.src) {
-                        video.play().catch(() => {});
-                    }
-                    if (video.src && video.src.includes('live')) {
-                        video.setAttribute('crossorigin', 'anonymous');
-                    }
-                    video.removeAttribute('poster');
+                if (video && video.paused && video.src) {
+                    video.play().catch(() => {});
                 }
             } catch(e) {}
             
-        } catch(e) {
-            // Ignoruj błędy
-        }
-    };
+        } catch(e) {}
+    }
     
     // =====================================================
-    // 2. ADGUARD - BLOKOWANIE REKLAM W FILMACH
+    // 2. BLOKOWANIE REKLAM - UPROSZCZONA WERSJA
     // =====================================================
-    const runAdGuard = () => {
+    function blockAds() {
         try {
-            if (!document || !document.head) {
-                setTimeout(runAdGuard, 100);
-                return;
-            }
+            if (!document || !document.head) return;
             
-            const locales = {
-                en: {
-                    logo: "with&nbsp;AdGuard",
-                    alreadyExecuted: "The shortcut has already been executed.",
-                    wrongDomain: "This shortcut is supposed to be launched only on YouTube.",
-                    success: "YouTube is now ad-free!"
-                },
-                pl: {
-                    logo: "z&nbsp;AdGuard",
-                    alreadyExecuted: "Skrypt został już wykonany.",
-                    wrongDomain: "Ten skrypt działa tylko na YouTube.",
-                    success: "YouTube jest teraz bez reklam!"
-                }
-            };
-            
-            const getMessage = (key) => {
-                try {
-                    const lang = navigator.language ? navigator.language.split('-')[0] : 'en';
-                    const locale = locales[lang] || locales.en;
-                    return locale[key] || locales.en[key];
-                } catch(e) {
-                    return locales.en[key];
-                }
-            };
-            
-            if (document.getElementById("block-youtube-ads-logo")) {
-                return;
-            }
-            
-            const hostname = window.location ? window.location.hostname : '';
-            if (hostname !== "www.youtube.com" && hostname !== "m.youtube.com" && hostname !== "music.youtube.com") {
-                return;
-            }
-            
-            const pageScript = () => {
-                const LOGO_ID = "block-youtube-ads-logo";
-                const hiddenCSS = {
-                    "www.youtube.com": [
-                        "#feed-pyv-container",
-                        "#merch-shelf",
-                        "#pla-shelf",
-                        "#promo-info",
-                        "#promo-list",
-                        "#promotion-shelf",
-                        "#search-pva",
-                        "#shelf-pyv-container",
-                        "#video-masthead",
-                        "#watch-branded-actions",
-                        ".companion-ad-container",
-                        ".promoted-videos",
-                        ".ytd-carousel-ad-renderer",
-                        ".ytd-compact-promoted-video-renderer",
-                        ".ytd-companion-slot-renderer",
-                        ".ytd-merch-shelf-renderer",
-                        ".ytd-promoted-video-renderer",
-                        ".ytd-search-pyv-renderer",
-                        ".ytd-video-masthead-ad-v3-renderer",
-                        ".ytp-ad-image-overlay",
-                        ".ytp-ad-overlay-container",
-                        "ytd-banner-promo-renderer",
-                        "ytd-display-ad-renderer",
-                        "ytd-promoted-sparkles-web-renderer",
-                        "ytd-promoted-video-renderer",
-                        "ytd-search-pyv-renderer"
-                    ]
-                };
-                
-                const hideElements = (hostname) => {
-                    const selectors = hiddenCSS[hostname];
-                    if (!selectors || !document.head) return;
-                    try {
-                        const rule = `${selectors.join(", ")} { display: none!important; }`;
-                        const style = document.createElement("style");
-                        style.id = 'block-youtube-ads-style';
-                        style.textContent = rule;
-                        document.head.appendChild(style);
-                    } catch(e) {}
-                };
-                
-                const autoSkipAds = () => {
-                    try {
-                        if (document.querySelector(".ad-showing")) {
-                            const video = document.querySelector("video");
-                            if (video && video.duration) {
-                                video.currentTime = video.duration;
-                                setTimeout(() => {
-                                    const skipBtn = document.querySelector("button.ytp-ad-skip-button");
-                                    if (skipBtn) skipBtn.click();
-                                }, 100);
-                            }
-                        }
-                    } catch(e) {}
-                };
-                
-                const addAdGuardLogo = () => {
-                    try {
-                        if (document.getElementById(LOGO_ID) || !document.head) return;
-                        const logo = document.createElement("span");
-                        logo.innerHTML = "__logo_text__";
-                        logo.setAttribute("id", LOGO_ID);
-                        const code = document.getElementById("country-code");
-                        if (code) {
-                            code.innerHTML = "";
-                            code.appendChild(logo);
-                        }
-                    } catch(e) {}
-                };
-                
-                try {
-                    hideElements(window.location.hostname);
-                    addAdGuardLogo();
-                    autoSkipAds();
-                    
-                    // Obserwuj zmiany
-                    const observer = new MutationObserver(() => {
-                        addAdGuardLogo();
-                        autoSkipAds();
-                        fixLiveStream();
-                    });
-                    if (document.documentElement) {
-                        observer.observe(document.documentElement, {
-                            childList: true,
-                            subtree: true
-                        });
-                    }
-                } catch(e) {}
-            };
-            
-            try {
-                const script = document.createElement("script");
-                const scriptText = pageScript.toString().replace("__logo_text__", getMessage("logo"));
-                script.innerHTML = `(${scriptText})();`;
-                document.head.appendChild(script);
-                document.head.removeChild(script);
-            } catch(e) {}
-            
-        } catch(e) {
-            // Ignoruj błędy
-        }
-    };
-    
-    // =====================================================
-    // 3. BLOKOWANIE BANERÓW SPONSOROWANYCH
-    // =====================================================
-    const blockSponsoredBanners = () => {
-        try {
-            if (!document || !document.head) {
-                setTimeout(blockSponsoredBanners, 100);
-                return;
-            }
-            
-            safeAppendStyle('easytube-sponsored-blocks', `
-                ytd-rich-item-renderer:has(ytd-display-ad-renderer),
-                ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
-                ytd-rich-item-renderer:has(ytd-promoted-video-renderer),
-                ytd-rich-item-renderer:has([class*="sponsored"]),
-                ytd-rich-item-renderer:has([class*="ad-badge"]),
-                ytd-rich-item-renderer:has([class*="promoted"]),
-                ytd-banner-renderer,
-                ytd-banner-promo-renderer,
-                ytd-merch-shelf-renderer,
-                ytd-carousel-ad-renderer,
+            // GŁÓWNE STYLE BLOKUJĄCE REKLAMY
+            safeAddStyle('easytube-adblock-styles', `
+                /* Blokowanie reklam w filmach */
+                .ytp-ad-overlay-container,
+                .ytp-ad-image-overlay,
+                .ytp-ad-action-interstitial,
+                .ytp-ad-text-overlay,
+                .ytp-ad-progress,
+                .ytp-ad-progress-list,
+                .ytp-ad-skip-button-container,
+                .ytp-ad-visit-advertiser-button,
+                .ytp-ad-image-overlay-container,
+                .ytp-ad-action-interstitial-background-container,
+                .ytp-ad-action-interstitial-slot,
+                .ytp-ad-overlay-container:not(:empty),
+                .ytp-ad-player-overlay,
+                .ytp-ad-overlay-slot,
+                .ad-showing,
+                .ad-interrupting,
+                #player-ads,
+                #masthead-ad,
+                ytd-ad-slot-renderer,
+                ytd-display-ad-renderer,
+                ytd-promoted-video-renderer,
+                ytd-compact-promoted-video-renderer,
                 ytd-video-masthead-ad-v3-renderer,
-                #contents > ytd-rich-item-renderer > ytd-display-ad-renderer,
+                ytd-banner-promo-renderer,
+                ytd-carousel-ad-renderer,
+                ytd-search-pyv-renderer,
+                ytd-promoted-sparkles-web-renderer,
+                ytd-promoted-sparkles-text-search-renderer,
+                ytd-merch-shelf-renderer,
+                ytd-companion-slot-renderer,
+                .companion-ad-container,
+                .promoted-videos,
+                .promoted-sparkles-text-search-root-container,
+                #feed-pyv-container,
+                #shelf-pyv-container,
+                #pla-shelf,
+                #merch-shelf,
+                #offer-module,
+                #video-masthead,
+                #watch-branded-actions,
+                [class*="ytd-display-ad-"],
+                [class*="display-ad-"],
                 [class*="ad-container"],
                 [class*="ad-badge"],
                 [class*="sponsored"],
-                [class*="promoted"],
-                ytd-search-pyv-renderer,
-                ytd-promoted-sparkles-web-renderer,
-                ytd-promoted-sparkles-text-search-renderer {
+                [class*="promoted"] {
                     display: none !important;
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                    height: 0 !important;
                     min-height: 0 !important;
                     max-height: 0 !important;
+                    overflow: hidden !important;
+                    pointer-events: none !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                
+                /* Ukryj kontenery z reklamami */
+                ytd-rich-item-renderer:has(ytd-display-ad-renderer),
+                ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
+                ytd-rich-item-renderer:has(ytd-promoted-video-renderer) {
+                    display: none !important;
                     height: 0 !important;
+                    min-height: 0 !important;
+                    max-height: 0 !important;
                     overflow: hidden !important;
                     padding: 0 !important;
                     margin: 0 !important;
                 }
             `);
             
-            const removeSponsoredElements = () => {
+            // AUTOMATYCZNE POMIJANIE REKLAM
+            function autoSkipAds() {
                 try {
-                    document.querySelectorAll('ytd-rich-item-renderer').forEach(el => {
-                        if (el.querySelector('ytd-display-ad-renderer, ytd-ad-slot-renderer, ytd-promoted-video-renderer')) {
-                            el.style.display = 'none';
-                            el.style.height = '0';
-                            el.style.overflow = 'hidden';
+                    const skipBtn = document.querySelector('.ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button');
+                    if (skipBtn && skipBtn.offsetParent !== null) {
+                        skipBtn.click();
+                        return;
+                    }
+                    
+                    if (document.querySelector('.ad-showing, .ad-interrupting')) {
+                        const video = document.querySelector('video');
+                        if (video && video.duration) {
+                            video.currentTime = video.duration;
                         }
-                    });
-                    
-                    const adSelectors = [
-                        'ytd-display-ad-renderer', 
-                        'ytd-ad-slot-renderer', 
-                        'ytd-promoted-video-renderer',
-                        'ytd-banner-promo-renderer',
-                        'ytd-video-masthead-ad-v3-renderer',
-                        'ytd-carousel-ad-renderer'
-                    ];
-                    
-                    adSelectors.forEach(selector => {
-                        document.querySelectorAll(selector).forEach(el => {
-                            el.style.display = 'none';
-                            el.style.height = '0';
-                            el.style.overflow = 'hidden';
-                        });
-                    });
+                    }
                 } catch(e) {}
-            };
+            }
             
-            removeSponsoredElements();
+            // Uruchom pomijanie
+            autoSkipAds();
             
+            // Obserwuj zmiany
             try {
                 const observer = new MutationObserver(() => {
-                    removeSponsoredElements();
+                    autoSkipAds();
                     fixLiveStream();
                 });
                 if (document.documentElement) {
@@ -421,39 +259,93 @@
                 }
             } catch(e) {}
             
-        } catch(e) {
-            // Ignoruj błędy
-        }
-    };
+        } catch(e) {}
+    }
+    
+    // =====================================================
+    // 3. BLOKOWANIE BANERÓW NA STRONIE GŁÓWNEJ
+    // =====================================================
+    function blockHomeBanners() {
+        try {
+            if (!document) return;
+            
+            function removeBanners() {
+                try {
+                    // Usuń banery sponsorowane
+                    document.querySelectorAll('ytd-rich-item-renderer').forEach(el => {
+                        if (el.querySelector('ytd-display-ad-renderer, ytd-ad-slot-renderer, ytd-promoted-video-renderer')) {
+                            el.style.display = 'none';
+                            el.style.height = '0';
+                            el.style.overflow = 'hidden';
+                            el.style.padding = '0';
+                            el.style.margin = '0';
+                        }
+                    });
+                    
+                    // Usuń elementy reklamowe
+                    const selectors = [
+                        'ytd-display-ad-renderer',
+                        'ytd-ad-slot-renderer',
+                        'ytd-promoted-video-renderer',
+                        'ytd-banner-promo-renderer',
+                        'ytd-video-masthead-ad-v3-renderer',
+                        'ytd-carousel-ad-renderer',
+                        'ytd-merch-shelf-renderer'
+                    ];
+                    
+                    selectors.forEach(selector => {
+                        document.querySelectorAll(selector).forEach(el => {
+                            if (el && el.style) {
+                                el.style.display = 'none';
+                                el.style.height = '0';
+                                el.style.overflow = 'hidden';
+                            }
+                        });
+                    });
+                } catch(e) {}
+            }
+            
+            removeBanners();
+            
+            try {
+                const observer = new MutationObserver(() => {
+                    removeBanners();
+                    fixLiveStream();
+                });
+                if (document.documentElement) {
+                    observer.observe(document.documentElement, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+            } catch(e) {}
+            
+        } catch(e) {}
+    }
     
     // =====================================================
     // 4. FUNKCJA LOGOWANIA
     // =====================================================
-    const setupLoginButton = () => {
+    function setupLogin() {
         try {
-            const hasSession = () => {
+            if (!document) return;
+            
+            function hasSession() {
                 try {
-                    return document.cookie.includes("SID=") || document.cookie.includes("HSID=");
+                    return document.cookie.includes('SID=') || document.cookie.includes('HSID=');
                 } catch(e) {
                     return false;
                 }
-            };
+            }
             
-            const modifyLoginButtons = () => {
+            function modifyButtons() {
                 try {
-                    const ytLoginButtons = document.querySelectorAll(
-                        'a[href*="accounts.google.com"], ' +
-                        'a[href*="ServiceLogin"], ' +
-                        'ytd-masthead #buttons a[href*="accounts.google.com"]'
-                    );
-                    
-                    ytLoginButtons.forEach(btn => {
+                    document.querySelectorAll('a[href*="accounts.google.com"], a[href*="ServiceLogin"]').forEach(btn => {
                         if (!btn.dataset.easytubeHooked) {
                             btn.dataset.easytubeHooked = 'true';
                             btn.style.color = '#1E90FF';
                             btn.style.fontWeight = 'bold';
-                            
-                            btn.addEventListener('click', (e) => {
+                            btn.addEventListener('click', function(e) {
                                 if (!hasSession()) {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -463,86 +355,96 @@
                         }
                     });
                 } catch(e) {}
-            };
+            }
             
-            modifyLoginButtons();
+            modifyButtons();
             
             try {
-                const loginObserver = new MutationObserver(() => {
-                    modifyLoginButtons();
-                });
+                const observer = new MutationObserver(modifyButtons);
                 if (document.documentElement) {
-                    loginObserver.observe(document.documentElement, {
+                    observer.observe(document.documentElement, {
                         childList: true,
                         subtree: true
                     });
                 }
             } catch(e) {}
             
-        } catch(e) {
-            // Ignoruj błędy
-        }
-    };
+        } catch(e) {}
+    }
     
     // =====================================================
-    // 5. GŁÓWNA FUNKCJA INICJALIZUJĄCA
+    // 5. FUNKCJA INICJUJĄCA
     // =====================================================
-    const initialize = () => {
+    function initialize() {
         try {
             // Sprawdź czy dokument jest gotowy
-            if (!document || !document.documentElement) {
-                setTimeout(initialize, 50);
+            if (!isDocumentReady()) {
+                setTimeout(initialize, 100);
                 return;
             }
             
-            // Naprawa live
+            // Najpierw naprawa live
             fixLiveStream();
             
-            // Uruchom AdGuard z opóźnieniem
+            // Potem blokowanie reklam
             setTimeout(() => {
-                try { runAdGuard(); } catch(e) {}
+                try { blockAds(); } catch(e) {}
+            }, 300);
+            
+            // Blokowanie banerów
+            setTimeout(() => {
+                try { blockHomeBanners(); } catch(e) {}
             }, 500);
             
-            // Uruchom blokowanie banerów
+            // Funkcja logowania
             setTimeout(() => {
-                try { blockSponsoredBanners(); } catch(e) {}
-            }, 600);
-            
-            // Uruchom funkcję logowania
-            setTimeout(() => {
-                try { setupLoginButton(); } catch(e) {}
+                try { setupLogin(); } catch(e) {}
             }, 700);
             
             // Okresowe czyszczenie
-            setInterval(() => {
-                if (adblockEnabled) {
-                    try { fixLiveStream(); } catch(e) {}
-                    try {
+            if (window.__easytube_interval) {
+                clearInterval(window.__easytube_interval);
+            }
+            
+            window.__easytube_interval = setInterval(() => {
+                try {
+                    if (window.__easytube_adblock_enabled !== false) {
+                        fixLiveStream();
+                        
+                        // Spróbuj odtworzyć wideo live
                         const video = document.querySelector('video');
                         if (video && video.paused && video.src && video.src.includes('live')) {
                             video.play().catch(() => {});
                         }
-                    } catch(e) {}
-                }
-            }, 1000);
+                    }
+                } catch(e) {}
+            }, 2000);
             
         } catch(e) {
-            // Jeśli wystąpił błąd, spróbuj ponownie
-            setTimeout(initialize, 100);
+            setTimeout(initialize, 200);
         }
-    };
+    }
     
     // =====================================================
-    // START
+    // START - CZEKAJ NA PEŁNE ZAŁADOWANIE STRONY
     // =====================================================
     
-    // Sprawdź czy dokument jest gotowy
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        initialize();
+    // Sprawdź czy dokument jest w pełni załadowany
+    if (document.readyState === 'complete') {
+        setTimeout(initialize, 500);
     } else {
-        document.addEventListener('DOMContentLoaded', initialize);
-        // Zabezpieczenie - jeśli DOMContentLoaded nie zadziała
-        setTimeout(initialize, 1000);
+        // Czekaj na pełne załadowanie
+        window.addEventListener('load', function() {
+            setTimeout(initialize, 500);
+        });
+        
+        // Zabezpieczenie - jeśli load nie zadziała
+        setTimeout(function() {
+            if (!window.__easytube_initialized) {
+                window.__easytube_initialized = true;
+                initialize();
+            }
+        }, 3000);
     }
     
 })();
