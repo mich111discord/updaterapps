@@ -1,7 +1,5 @@
 
 {
-  "9.0": true,
-  "8.5": true,
-  "8.0": true,
+  "9.0": false,
   "message": "Wersja Twojego programu jest przestarzała. Pobierz najnowszą wersję TempCleaner Pro z naszej strony!"
 }
