@@ -1,0 +1,66 @@
+{
+  "version": "1.1",
+  "updated": "2026-10-24",
+  "app_min_version": "0.2.0",
+  "patches": [
+    {
+      "id": "hearts_block",
+      "name": "Blokada serduszek",
+      "description": "Blokuje API remove-heart / DECREMENT_ONE_HEART – serduszka nie spadają",
+      "enabled_by_default": true,
+      "type": "interceptor",
+      "priority": 10,
+      "match_urls": ["remove-heart", "decrement_one_heart", "/hearts/remove", "health/remove"]
+    },
+    {
+      "id": "lite_mode",
+      "name": "Tryb Lite",
+      "description": "Wyłącza analytics, tracking i zbędne skrypty",
+      "enabled_by_default": false,
+      "type": "interceptor",
+      "priority": 20,
+      "match_urls": ["google-analytics.com", "googletagmanager.com", "facebook.net", "doubleclick.net", "/log_event", "sentry.io"]
+    },
+    {
+      "id": "lesson_helper",
+      "name": "Pomoc w lekcjach",
+      "description": "Podpowiedzi i pokazywanie poprawnej odpowiedzi",
+      "enabled_by_default": false,
+      "type": "js",
+      "priority": 30
+    },
+    {
+      "id": "dark_theme_force",
+      "name": "Wymuszony ciemny motyw",
+      "description": "CSS dark mode",
+      "enabled_by_default": false,
+      "type": "css",
+      "priority": 40,
+      "css": "body,#root{background:#121212!important;color:#e0e0e0!important}..."
+    },
+    {
+      "id": "hide_super_promo",
+      "name": "Ukryj promocje Super",
+      "description": "Ukrywa banery Super / Max",
+      "enabled_by_default": false,
+      "type": "css",
+      "priority": 50
+    },
+    {
+      "id": "hide_ads",
+      "name": "Ukryj reklamy",
+      "description": "Ukrywa kontenery reklamowe",
+      "enabled_by_default": false,
+      "type": "css",
+      "priority": 55
+    },
+    {
+      "id": "compact_ui",
+      "name": "Kompaktowy UI",
+      "description": "Mniejsze odstępy, więcej treści",
+      "enabled_by_default": false,
+      "type": "css",
+      "priority": 60
+    }
+  ]
+}
