@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "url": "",
-  "sha256": "",
-  "changelog": ""
+  "version": "1.0.1",
+  "url": "https://github.com/mich111discord/updaterapps/releases/download/1.0.1EasyDraw/EasySuite-EasyDraw-update-171120261946.exe",
+  "sha256": "04fc4b45f61738ae91fb908e94ab8d8719f1686e7fcc2c73b7191ff979164015",
+  "changelog": "Naprawiono błędy w tej wersji występuje 1 błąd splash nie pokazuje się poprawnie"
 }
